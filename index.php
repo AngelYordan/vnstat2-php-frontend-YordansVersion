@@ -298,7 +298,9 @@
 
   function updatePanel() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'live.php?if=<?php print rawurlencode($iface); ?>&style=<?php print rawurlencode($style); ?>', true);
+    var url = 'live.php?if=<?php print rawurlencode($iface); ?>&style=<?php print rawurlencode($style); ?>&_ts=' + Date.now();
+    xhr.open('GET', url, true);
+    xhr.setRequestHeader('Cache-Control', 'no-cache');
     xhr.onreadystatechange = function () {
       if (xhr.readyState !== 4) {
         return;

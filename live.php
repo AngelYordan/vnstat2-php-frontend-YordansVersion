@@ -26,6 +26,9 @@ $rx_bytes = read_counter($rx_path);
 $tx_bytes = read_counter($tx_path);
 
 header('Content-type: application/json; charset=utf-8');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 if ($rx_bytes === null || $tx_bytes === null) {
     http_response_code(500);
