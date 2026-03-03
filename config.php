@@ -28,21 +28,20 @@
     // edit these to reflect your particular situation
     //
     $locale = 'en_US.UTF-8';
-    $language = 'nl';
+    $language = 'es';
 
     // Set local timezone
     date_default_timezone_set("Europe/Amsterdam");
 
     // list of network interfaces monitored by vnStat
-    $iface_list = array('eth0', 'sixxs');
+    $iface_list = array('enp3s0f1');
 
     //
     // optional names for interfaces
     // if there's no name set for an interface then the interface identifier
     // will be displayed instead
     //
-    $iface_title['eth0'] = 'Internal';
-    $iface_title['sixxs'] = 'SixXS IPv6';
+    $iface_title['enp3s0f1'] = ' Conexion Ethernet';
 
     //
     // There are two possible sources for vnstat data. If the $vnstat_bin
@@ -65,7 +64,7 @@
 
     // preferred byte notation. null auto chooses. otherwise use one of
     // 'TB','GB','MB','KB'
-    $byte_notation = null;
+    $byte_notation = 'MB';
 
     // Font to use for PNG graphs
     define('GRAPH_FONT',dirname(__FILE__).'/VeraBd.ttf');
