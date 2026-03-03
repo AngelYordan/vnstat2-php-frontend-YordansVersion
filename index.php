@@ -234,58 +234,18 @@
 <head>
   <title>vnStat - PHP frontend</title>
   <link rel="stylesheet" type="text/css" href="themes/<?php echo $style ?>/style.css"/>
-  <style type="text/css">
-    #live-traffic-panel {
-      position: fixed;
-      right: 12px;
-      top: 12px;
-      min-width: 210px;
-      padding: 10px 12px;
-      border: 1px solid #99b;
-      background: rgba(255, 255, 255, 0.95);
-      font-family: 'Trebuchet MS', Verdana, sans-serif;
-      z-index: 9999;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    }
-
-    #live-traffic-panel .title {
-      font-weight: bold;
-      margin-bottom: 8px;
-      font-size: 0.95em;
-    }
-
-    #live-traffic-panel .metric {
-      margin: 4px 0;
-      font-size: 1.1em;
-      font-weight: bold;
-    }
-
-    #live-rx {
-      color: #d11d1d;
-    }
-
-    #live-tx {
-      color: #0a9f33;
-    }
-
-    #live-status {
-      margin-top: 6px;
-      color: #555;
-      font-size: 0.75em;
-    }
-  </style>
 </head>
 <body>
 
 <div id="wrap">
   <div id="sidebar"><?php write_side_bar(); ?></div>
-  <div id="live-traffic-panel">
-    <div class="title"><?php print T('Traffic data for')." ".(isset($iface_title[$iface]) ? $iface_title[$iface] : $iface); ?></div>
-    <div id="live-rx" class="metric">In: --</div>
-    <div id="live-tx" class="metric">Out: --</div>
-    <div id="live-status">Actualizando cada 0.5s</div>
-  </div>
    <div id="content">
+    <div id="live-traffic-panel">
+      <div class="title"><?php print T('Traffic data for')." ".(isset($iface_title[$iface]) ? $iface_title[$iface] : $iface); ?></div>
+      <div id="live-rx" class="metric">In: --</div>
+      <div id="live-tx" class="metric">Out: --</div>
+      <div id="live-status">Actualizando cada 0.5s</div>
+    </div>
     <div id="header"><?php print T('Traffic data for').(isset($iface_title[$iface]) ? $iface_title[$iface] : '')." ($iface)";?></div>
     <div id="main">
     <?php

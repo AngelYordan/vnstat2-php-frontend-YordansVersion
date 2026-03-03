@@ -1,170 +1,213 @@
-body
-{
-	background-color: #D2D2D2;
-	margin: 8px;
-	padding: 0;
+body {
+    margin: 0;
+    padding: 24px;
+    background: #f5f7fb;
+    color: #1f2937;
+    font-family: 'Segoe UI', 'Inter', 'Trebuchet MS', Verdana, sans-serif;
 }
 
-#content
-{
-    width: 898px;
-}
-
-#sidebar
-{
-    position: absolute;
-    left: 8px;
-    top: 8px;
-    width: 160px;
-    border-right: 1px solid #82001D;
-    border-collapse: collapse;
-    float: left;
-}
-
-#sidebar ul.iface
-{
-    margin: 0px;
-    padding: 0px;
-    border-top: 1px dashed #82001D;
-    background-color: #D2D2D2;
-    color: #82001D;
-}
-
-#sidebar li.iface
-{
-    list-style-type: none;
-    margin: 0px;
-    padding: 0px;
-    font-family: 'Trebuchet MS', Verdana, sans-serif;
-    font-size: 1em;
-    font-weight: bold;
-    border-bottom: 1px dashed #82001D;
-}
-
-#sidebar a
-{
-    font-family: 'Trebuchet MS', Verdana, sans-serif;
-    font-size: 1em;
-    font-weight: bold;
-}
-
-#sidebar ul.page
-{
-    margin: 0px;
-    padding: 0px;
-    border-top: 1px dashed #82001D;
-}
-
-#sidebar li.page
-{
-    list-style-type: none;
-    margin: 0px;
-    padding: 4px;
-    border: none;
-    font-family: 'Trebuchet MS', Verdana, sans-serif;
-    font-size: 0.75em;
-    font-weight: normal;
-    text-align: right;
-    background-color: #C1C1C1;
-    color: #82001D;
-}
-
-
-#header
-{
-    width: 720px;
-    margin-left: 160px;
-    padding: 0px 8px 0px 8px;
-    border-width: 1px 1px 1px 1px;
-    border-style: dashed solid dashed solid;
-    border-color: #82001D;
-    border-collapse: collapse;
-    background-color: #D2D2D2;
-    color: #82001D;
-    font-family: 'Trebuchet MS', Verdana, sans-serif;
-    font-size: 1em;
-    font-weight: bold;
-    text-align: center;
-}
-
-#footer
-{
-    width: 720px;
-    margin-left: 160px;
-    padding: 2px 8px 2px 8px;
-    border-width: 1px 1px 1px 1px;
-    border-style: solid;
-    border-color: #82001D;
-    border-collapse: collapse;
-    background-color: #D2D2D2;
-    color: #82001D;
-    font-family: 'Trebuchet MS', Verdana, sans-serif;
-    font-size: 0.70em;
-    text-align: center;
-}
-
-#main
-{
-    width: 720px;
-    margin-left: 160px;
-    padding: 8px 8px 8px 8px;
-    border-left: 1px solid #82001D;
-    border-right: 1px solid #82001D;
-    border-collapse: collapse;
-}
-
-#main td
-{
-    font-family: 'Trebuchet MS', Verdana, sans-serif;
-    font-size: 0.8em;
-}
-
-#main td.numeric_odd
-{
-    text-align: right;
-    background-color: #C9C9C9;
-    color: #82001D;
-}
-
-#main td.numeric_even
-{
-    text-align: right;
-    background-color: #CFCFCF;
-    color: #82001D;
-}
-
-#main td.label_odd
-{
-    background-color: #A6A6A6;
-    color: #82001D;
-}
-
-#main td.label_even
-{
-    background-color: #C1C1C1;
-    color: #82001D;
-}
-
-#main th.label
-{
-    font-family: 'Trebuchet MS', Verdana, sans-serif;
-    font-size: 1em;
-    font-weight: bold;
-    background-color: #A6A6A6;
-    color: #82001D;
-}
-
-#main caption
-{
-    font-family: 'Trebuchet MS', Verdana, sans-serif;
-    font-size: 1.25em;
-    font-weight: bold;
-    padding: 4px;
-    color: #82001D;
-}
-
-a
-{
+a[href]:link,
+a[href]:visited {
+    color: #2563eb;
     text-decoration: none;
-    color: #A80022;
+}
+
+a[href]:hover,
+a[href]:active,
+a[href]:focus {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+#wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+#sidebar {
+    width: 220px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+}
+
+#sidebar ul.iface {
+    margin: 0;
+    padding: 10px;
+    list-style: none;
+}
+
+#sidebar li.iface ul {
+    display: none;
+}
+
+#sidebar li.iface.active ul,
+#sidebar li.iface:hover ul {
+    display: block;
+}
+
+#sidebar li.iface {
+    margin: 0 0 8px 0;
+    padding: 10px 10px 6px;
+    border-radius: 10px;
+    list-style-type: none;
+    font-size: 13px;
+    font-weight: 600;
+    background: #f8fafc;
+}
+
+#sidebar li.iface.active {
+    background: #eff6ff;
+}
+
+#sidebar a {
+    font-size: 1em;
+    font-weight: 600;
+}
+
+#sidebar ul.page {
+    margin: 8px 0 0;
+    padding: 8px;
+    border-top: 1px solid #e5e7eb;
+    background: #ffffff;
+    border-radius: 8px;
+}
+
+#sidebar li.page {
+    margin: 0;
+    padding: 6px 4px;
+    list-style-type: none;
+    font-size: 0.83em;
+    font-weight: 500;
+    text-align: left;
+    color: #111827;
+}
+
+#content {
+    flex: 1;
+    min-width: 0;
+}
+
+#live-traffic-panel {
+    position: static;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+}
+
+#live-traffic-panel .title {
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+#live-traffic-panel .metric {
+    margin: 2px 0;
+    font-size: 1.03em;
+    font-weight: 600;
+}
+
+#live-rx { color: #dc2626; }
+#live-tx { color: #16a34a; }
+
+#live-status {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 0.78em;
+}
+
+#header {
+    padding: 16px 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px 12px 0 0;
+    background: #ffffff;
+    font-size: 1.1em;
+    font-weight: 700;
+}
+
+#main {
+    padding: 18px;
+    border: 1px solid #e5e7eb;
+    border-top: none;
+    background: #ffffff;
+}
+
+#main object,
+#main img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+#main table {
+    border-collapse: collapse;
+}
+
+#main td {
+    font-size: 0.86em;
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+#main td.numeric_odd,
+#main td.numeric_even {
+    text-align: right;
+    color: #111827;
+    background-color: #f9fafb;
+}
+
+#main td.label_odd,
+#main td.label_even {
+    color: #111827;
+    background-color: #f3f4f6;
+    font-weight: 600;
+}
+
+#main th.label {
+    font-size: 0.84em;
+    font-weight: 700;
+    color: #374151;
+    background-color: #e5e7eb;
+    padding: 10px;
+    border-bottom: 1px solid #d1d5db;
+}
+
+#main caption {
+    font-size: 1.08em;
+    font-weight: 700;
+    padding: 10px;
+    text-align: left;
+}
+
+#footer {
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    background: #ffffff;
+    font-size: 0.72em;
+    text-align: center;
+    color: #6b7280;
+}
+
+@media (max-width: 960px) {
+    body {
+        padding: 12px;
+    }
+
+    #wrap {
+        flex-direction: column;
+    }
+
+    #sidebar {
+        width: 100%;
+    }
 }
