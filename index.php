@@ -297,51 +297,56 @@
   }
 
   function updatePanel() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'live.php?if=<?php print rawurlencode($iface); ?>&style=<?php print rawurlencode($style); ?>', true);
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState !== 4) {
-        return;
-      }
+    var url = 'live.php?if=<?php print rawurlencode($iface); ?>&style=<?php print rawurlencode($style); ?>&_ts=' + Date.now();
 
-      if (xhr.status !== 200) {
+    fetch(url, {
+      method: 'GET',
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache'
+      }
+    })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error('http_error');
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        if (!lastSample) {
+          lastSample = data;
+          return;
+        }
+
+        var elapsed = (data.timestamp_ms - lastSample.timestamp_ms) / 1000;
+        if (elapsed <= 0) {
+          lastSample = data;
+          return;
+        }
+
+        var rxBytes = BigInt(data.rx_bytes);
+        var txBytes = BigInt(data.tx_bytes);
+        var lastRxBytes = BigInt(lastSample.rx_bytes);
+        var lastTxBytes = BigInt(lastSample.tx_bytes);
+
+        var rxDelta = Number(rxBytes - lastRxBytes);
+        var txDelta = Number(txBytes - lastTxBytes);
+
+        var rxRate = rxDelta / elapsed;
+        var txRate = txDelta / elapsed;
+
+        if (rxRate < 0) { rxRate = 0; }
+        if (txRate < 0) { txRate = 0; }
+
+        document.getElementById('live-rx').textContent = 'In: ' + formatRate(rxRate);
+        document.getElementById('live-tx').textContent = 'Out: ' + formatRate(txRate);
+        document.getElementById('live-status').textContent = 'Actualizado: ' + (new Date()).toLocaleTimeString();
+
+        lastSample = data;
+      })
+      .catch(function () {
         document.getElementById('live-status').textContent = 'Error al obtener datos en tiempo real';
-        return;
-      }
-
-      var data;
-      try {
-        data = JSON.parse(xhr.responseText);
-      } catch (e) {
-        document.getElementById('live-status').textContent = 'Error al procesar datos';
-        return;
-      }
-
-      if (!lastSample) {
-        lastSample = data;
-        return;
-      }
-
-      var elapsed = (data.timestamp_ms - lastSample.timestamp_ms) / 1000;
-      if (elapsed <= 0) {
-        lastSample = data;
-        return;
-      }
-
-      var rxRate = (data.rx_bytes - lastSample.rx_bytes) / elapsed;
-      var txRate = (data.tx_bytes - lastSample.tx_bytes) / elapsed;
-
-      if (rxRate < 0) { rxRate = 0; }
-      if (txRate < 0) { txRate = 0; }
-
-      document.getElementById('live-rx').textContent = 'In: ' + formatRate(rxRate);
-      document.getElementById('live-tx').textContent = 'Out: ' + formatRate(txRate);
-      document.getElementById('live-status').textContent = 'Actualizado: ' + (new Date()).toLocaleTimeString();
-
-      lastSample = data;
-    };
-
-    xhr.send();
+      });
   }
 
   updatePanel();
