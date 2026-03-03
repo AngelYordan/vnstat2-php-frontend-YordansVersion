@@ -109,10 +109,10 @@
         //
         // image object
         //
-        $xlm = 70;
-        $xrm = 20;
-        $ytm = 35;
-        $ybm = 60;
+        $xlm = 72;
+        $xrm = 24;
+        $ytm = 42;
+        $ybm = 68;
         if ($graph == 'small')
         {
             $iw = 300 + $xrm + $xlm;
@@ -142,18 +142,13 @@
         $cl['tx'] = allocate_color($cs['tx']);
         $cl['tx_border'] = allocate_color($cs['tx_border']);
 
-        svg_rect(0, 0, $iw, $ih, array( 'stroke' => 'none', 'stroke-width' => 0, 'fill' => $cl['image_background']['rgb']) );
+	svg_rect(0, 0, $iw, $ih, array( 'stroke' => 'none', 'stroke-width' => 0, 'fill' => $cl['image_background']['rgb']) );
 	svg_rect($xlm, $ytm, $iw-$xrm-$xlm, $ih-$ybm-$ytm, array( 'stroke' => 'none', 'stroke-width' => 0, 'fill' => $cl['background']['rgb']) );
-
-	$depth = 12*SVG_DEPTH_SCALING;
-	svg_group( array( 'stroke' => 'none', 'stroke-width' => 0, 'fill' => $cl['background_2']['rgb'], 'fill-opacity' => $cl['background_2']['opacity']) );
-	svg_poly(array($xlm, $ytm, $xlm, $ih - $ybm, $xlm - $depth, $ih - $ybm + $depth, $xlm - $depth, $ytm + $depth));
-	svg_poly(array($xlm, $ih - $ybm, $xlm - $depth, $ih - $ybm + $depth, $iw - $xrm - $depth, $ih - $ybm  + $depth, $iw - $xrm, $ih - $ybm));
-	svg_group_end();
+	svg_rect($xlm, $ytm, $iw-$xrm-$xlm, 28, array( 'stroke' => 'none', 'stroke-width' => 0, 'fill' => $cl['background_2']['rgb'], 'fill-opacity' => '0.20') );
 
 	// draw title
 	$text = T('Traffic data for')." $iface";
-	svg_text($iw / 2, ($ytm / 2), $text, array( 'stroke' => 'none', 'fill' => $cl['text']['rgb'],'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-weight' => 'bold', 'text-anchor' => 'middle' ));
+	svg_text($iw / 2, ($ytm / 2) + 2, $text, array( 'stroke' => 'none', 'fill' => $cl['text']['rgb'],'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-weight' => 'bold', 'font-size' => '12pt', 'text-anchor' => 'middle' ));
     }
 
     function draw_border()
@@ -168,18 +163,14 @@
         $x_step = ($iw - $xlm - $xrm) / ($x_ticks ?: 1);
         $y_step = ($ih - $ytm - $ybm) / $y_ticks;
 
-	$depth = 12*SVG_DEPTH_SCALING;
-
-	svg_group( array( 'stroke' => $cl['grid_stipple_1']['rgb'], 'stroke-opacity' => $cl['grid_stipple_1']['opacity'], 'stroke-width' => '1px', 'stroke-dasharray' => '1,1' ) );
+	svg_group( array( 'stroke' => $cl['grid_stipple_1']['rgb'], 'stroke-opacity' => '0.45', 'stroke-width' => '1px', 'stroke-dasharray' => '2,3' ) );
         for ($i = $xlm; $i <= ($iw - $xrm); $i += $x_step)
         {
 	    svg_line($i, $ytm, $i, $ih-$ybm);
-            svg_line($i, $ih-$ybm, $i-$depth, $ih-$ybm+$depth);
         }
         for ($i = $ytm; $i <= ($ih - $ybm); $i += $y_step)
         {
             svg_line($xlm, $i, $iw - $xrm, $i);
-	    svg_line($xlm, $i, $xlm - $depth, $i + $depth);
         }
 	svg_group_end();
 
@@ -205,7 +196,7 @@
         $gr_h = $ih - $ytm - $ybm;
         $x_step = ($iw - $xlm - $xrm) / ($x_ticks ?: 1);
         $y_step = ($ih - $ytm - $ybm) / $y_ticks;
-        $bar_w = ($x_step / 2) ;
+        $bar_w = ($x_step / 2);
 
         //
         // determine scale
@@ -262,38 +253,30 @@
         	$x = $xlm + ($i * $x_step);
         	$y = $ytm + ($ih - $ytm - $ybm) - (($data[$i]['rx'] - $offset) / $sf);
 
-		$depth = ($x_ticks < 20) ? 8*SVG_DEPTH_SCALING : 6*SVG_DEPTH_SCALING;
-		$space = 0;
+		$space = ($x_ticks > 16) ? 1 : 2;
 
 		$x1 = (int)$x;
 		$y1 = (int)$y;
 		$w = (int)($bar_w - $space);
 		$h = (int)($ih - $ybm - $y);
-		$x2 = (int)($x + $bar_w - $space);
-		$y2 = (int)($ih - $ybm);
 
 		svg_group( array( 'stroke' => $cl['rx_border']['rgb'], 'stroke-opacity' => $cl['rx_border']['opacity'], 
 				  'stroke-width' => 1, 'stroke-linejoin' => 'round',
 			          'fill' => $cl['rx']['rgb'], 'fill-opacity' => $cl['rx']['opacity'] ) );
-        	svg_rect($x1, $y1, $w, $h);
-		svg_rect($x1 - $depth, $y1 + $depth, $w, $h);
-		svg_poly(array($x1, $y1, $x2, $y1, $x2 - $depth, $y1 + $depth, $x1 - $depth, $y1 + $depth));
-		svg_poly(array($x2, $y1, $x2, $y2, $x2 - $depth, $y2 + $depth, $x2 - $depth, $y1 + $depth));
+	        svg_rect($x1, $y1, $w, $h, array('rx' => '2', 'ry' => '2'));
+		svg_rect($x1, $y1, $w, 2, array('stroke' => 'none', 'fill' => '#FFFFFF', 'fill-opacity' => '0.25', 'rx' => '2', 'ry' => '2'));
 		svg_group_end();
 
-        	$y1 = (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['tx'] - $offset) / $sf));
+	        $y1 = (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['tx'] - $offset) / $sf));
 		$x1 = (int)($x1 + $bar_w);
-		$x2 = (int)($x2 + $bar_w);
 		$w = (int)($bar_w - $space);
 		$h = (int)($ih - $ybm - $y1 - 1);
 
 		svg_group( array( 'stroke' => $cl['tx_border']['rgb'], 'stroke-opacity' => $cl['tx_border']['opacity'],
 				  'stroke-width' => 1, 'stroke-linejoin' => 'round',
 			          'fill' => $cl['tx']['rgb'], 'fill-opacity' => $cl['tx']['opacity'] ) );
-        	svg_rect($x1, $y1, $w, $h);
-		svg_rect($x1 - $depth, $y1 + $depth, $w, $h);
-		svg_poly(array($x1, $y1, $x2, $y1, $x2 - $depth, $y1 + $depth, $x1 - $depth, $y1 + $depth));
-		svg_poly(array($x2, $y1, $x2, $y2, $x2 - $depth, $y2 + $depth, $x2 - $depth, $y1 + $depth));
+	        svg_rect($x1, $y1, $w, $h, array('rx' => '2', 'ry' => '2'));
+		svg_rect($x1, $y1, $w, 2, array('stroke' => 'none', 'fill' => '#FFFFFF', 'fill-opacity' => '0.20', 'rx' => '2', 'ry' => '2'));
 		svg_group_end();
             }
 
@@ -305,7 +288,7 @@
             {
                 $label = ($i * $y_scale).$unit;
 		$tx = $xlm - 16;
-		$ty = (int)(($ih - $ybm) - ($i * $y_step) + 8 + $depth);
+		$ty = (int)(($ih - $ybm) - ($i * $y_step) + 4);
 		svg_text($tx, $ty, $label);
             }
 	    svg_group_end();
@@ -314,7 +297,7 @@
             for ($i=0; $i<$x_ticks; $i++)
             {
                 $label = $data[$i]['img_label'];
-		svg_text($xlm + ($i * $x_step) + ($x_step / 2) - $depth - 4, $ih - $ybm + 20 + $depth, $label);
+		svg_text($xlm + ($i * $x_step) + ($x_step / 2), $ih - $ybm + 22, $label);
             }
 	    svg_group_end();
         }
@@ -325,11 +308,11 @@
         //
         // legend
         //
-        svg_rect($xlm, $ih-$ybm+39, 8, 8, array( 'stroke' => $cl['text']['rgb'], 'stroke-width' => 1, 'fill' => $cl['rx']['rgb']) );
-	svg_text($xlm+14, $ih-$ybm+48, T('bytes in'), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
+        svg_rect($xlm, $ih-$ybm+39, 10, 10, array( 'stroke' => $cl['text']['rgb'], 'stroke-width' => 1, 'fill' => $cl['rx']['rgb'], 'rx' => '2', 'ry' => '2') );
+	svg_text($xlm+16, $ih-$ybm+48, T('bytes in'), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
 
-        svg_rect($xlm+120 , $ih-$ybm+39, 8, 8, array( 'stroke' => $cl['text']['rgb'], 'stroke-width' => 1, 'fill' => $cl['tx']['rgb']) );
-	svg_text($xlm+134, $ih-$ybm+48, T('bytes out'), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
+        svg_rect($xlm+120 , $ih-$ybm+39, 10, 10, array( 'stroke' => $cl['text']['rgb'], 'stroke-width' => 1, 'fill' => $cl['tx']['rgb'], 'rx' => '2', 'ry' => '2') );
+	svg_text($xlm+136, $ih-$ybm+48, T('bytes out'), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
     }
 
     function output_image()
