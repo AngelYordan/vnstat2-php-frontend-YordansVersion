@@ -324,12 +324,12 @@
   var lastSample = null;
 
   function formatRate(bytesPerSecond) {
-    var units = ['B/s', 'KiB/s', 'MiB/s', 'GiB/s'];
+    var units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
     var value = bytesPerSecond;
     var index = 0;
 
-    while (value >= 1024 && index < units.length - 1) {
-      value = value / 1024;
+    while (value >= 1000 && index < units.length - 1) {
+      value = value / 1000;
       index += 1;
     }
 
