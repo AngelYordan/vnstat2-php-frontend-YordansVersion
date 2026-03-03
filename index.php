@@ -234,11 +234,57 @@
 <head>
   <title>vnStat - PHP frontend</title>
   <link rel="stylesheet" type="text/css" href="themes/<?php echo $style ?>/style.css"/>
+  <style type="text/css">
+    #live-traffic-panel {
+      position: fixed;
+      right: 12px;
+      top: 12px;
+      min-width: 210px;
+      padding: 10px 12px;
+      border: 1px solid #99b;
+      background: rgba(255, 255, 255, 0.95);
+      font-family: 'Trebuchet MS', Verdana, sans-serif;
+      z-index: 9999;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    #live-traffic-panel .title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    #live-traffic-panel .metric {
+      margin: 4px 0;
+      font-size: 1.1em;
+      font-weight: bold;
+    }
+
+    #live-rx {
+      color: #d11d1d;
+    }
+
+    #live-tx {
+      color: #0a9f33;
+    }
+
+    #live-status {
+      margin-top: 6px;
+      color: #555;
+      font-size: 0.75em;
+    }
+  </style>
 </head>
 <body>
 
 <div id="wrap">
   <div id="sidebar"><?php write_side_bar(); ?></div>
+  <div id="live-traffic-panel">
+    <div class="title"><?php print T('Traffic data for')." ".(isset($iface_title[$iface]) ? $iface_title[$iface] : $iface); ?></div>
+    <div id="live-rx" class="metric">In: --</div>
+    <div id="live-tx" class="metric">Out: --</div>
+    <div id="live-status">Actualizando cada 0.5s</div>
+  </div>
    <div id="content">
     <div id="header"><?php print T('Traffic data for').(isset($iface_title[$iface]) ? $iface_title[$iface] : '')." ($iface)";?></div>
     <div id="main">
@@ -272,5 +318,75 @@
     <div id="footer"><a href="http://www.sqweek.com/">vnStat PHP frontend</a> 2.0.0 - &copy;2006-2011 Bjorge Dijkstra (bjd _at_ jooz.net)</div>
   </div>
 </div>
+
+<script type="text/javascript">
+(function () {
+  var lastSample = null;
+
+  function formatRate(bytesPerSecond) {
+    var units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
+    var value = bytesPerSecond;
+    var index = 0;
+
+    while (value >= 1000 && index < units.length - 1) {
+      value = value / 1000;
+      index += 1;
+    }
+
+    return value.toFixed(2) + ' ' + units[index];
+  }
+
+  function updatePanel() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'live.php?if=<?php print rawurlencode($iface); ?>&style=<?php print rawurlencode($style); ?>', true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) {
+        return;
+      }
+
+      if (xhr.status !== 200) {
+        document.getElementById('live-status').textContent = 'Error al obtener datos en tiempo real';
+        return;
+      }
+
+      var data;
+      try {
+        data = JSON.parse(xhr.responseText);
+      } catch (e) {
+        document.getElementById('live-status').textContent = 'Error al procesar datos';
+        return;
+      }
+
+      if (!lastSample) {
+        lastSample = data;
+        return;
+      }
+
+      var elapsed = (data.timestamp_ms - lastSample.timestamp_ms) / 1000;
+      if (elapsed <= 0) {
+        lastSample = data;
+        return;
+      }
+
+      var rxRate = (data.rx_bytes - lastSample.rx_bytes) / elapsed;
+      var txRate = (data.tx_bytes - lastSample.tx_bytes) / elapsed;
+
+      if (rxRate < 0) { rxRate = 0; }
+      if (txRate < 0) { txRate = 0; }
+
+      document.getElementById('live-rx').textContent = 'In: ' + formatRate(rxRate);
+      document.getElementById('live-tx').textContent = 'Out: ' + formatRate(txRate);
+      document.getElementById('live-status').textContent = 'Actualizado: ' + (new Date()).toLocaleTimeString();
+
+      lastSample = data;
+    };
+
+    xhr.send();
+  }
+
+  updatePanel();
+  setInterval(updatePanel, 500);
+})();
+</script>
 
 </body></html>
