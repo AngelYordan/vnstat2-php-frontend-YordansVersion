@@ -16,7 +16,7 @@ function read_counter($path)
         return null;
     }
 
-    return (float)$value;
+    return $value;
 }
 
 $rx_path = "/sys/class/net/$iface/statistics/rx_bytes";
