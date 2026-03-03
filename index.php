@@ -261,11 +261,11 @@
     }
 
     #live-rx {
-      color: #0a9f33;
+      color: #d11d1d;
     }
 
     #live-tx {
-      color: #d11d1d;
+      color: #0a9f33;
     }
 
     #live-status {
