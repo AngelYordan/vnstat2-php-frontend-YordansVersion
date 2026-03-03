@@ -70,23 +70,53 @@
 
         global $byte_notation;
 
-        $units = array('TiB','GiB','MiB','KiB');
-        $scale = 1024*1024*1024;
-        $ui = 0;
+        $bytes = $kb * 1024;
 
-        $custom_size = isset($byte_notation) && in_array($byte_notation, $units);
+        $binary_units = array(
+            'TiB' => 1024*1024*1024*1024,
+            'GiB' => 1024*1024*1024,
+            'MiB' => 1024*1024,
+            'KiB' => 1024,
+        );
 
-        while ((($kb < $scale) && ($scale > 1)) || $custom_size)
-        {
-            $ui++;
-            $scale = $scale / 1024;
+        $decimal_units = array(
+            'TB' => 1000*1000*1000*1000,
+            'GB' => 1000*1000*1000,
+            'MB' => 1000*1000,
+            'KB' => 1000,
+        );
 
-            if ($custom_size && $units[$ui] == $byte_notation) {
-                break;
+        if (isset($byte_notation) && is_string($byte_notation)) {
+            $preferred_unit = strtoupper(trim($byte_notation));
+
+            if (isset($decimal_units[$preferred_unit])) {
+                return sprintf("%0.2f %s", ($bytes/$decimal_units[$preferred_unit]), $preferred_unit);
+            }
+
+            $binary_aliases = array(
+                'TIB' => 'TiB',
+                'GIB' => 'GiB',
+                'MIB' => 'MiB',
+                'KIB' => 'KiB',
+            );
+
+            if (isset($binary_aliases[$preferred_unit])) {
+                $preferred_unit = $binary_aliases[$preferred_unit];
+            }
+
+            if (isset($binary_units[$preferred_unit])) {
+                return sprintf("%0.2f %s", ($bytes/$binary_units[$preferred_unit]), $preferred_unit);
             }
         }
 
-        return sprintf("%0.2f %s", ($kb/$scale),$units[$ui]);
+        foreach ($binary_units as $unit => $divisor)
+        {
+            if ($bytes >= $divisor) {
+                return sprintf("%0.2f %s", ($bytes/$divisor), $unit);
+            }
+        }
+
+        return sprintf("%0.2f KiB", ($bytes/1024));
     }
 
     function write_summary()
