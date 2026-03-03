@@ -119,6 +119,22 @@
         return sprintf("%0.2f KiB", ($bytes/1024));
     }
 
+    function kbytes_to_mb_string($kb)
+    {
+        $bytes = $kb * 1024;
+        $megabytes = $bytes / (1000 * 1000);
+
+        return number_format($megabytes, 2, '.', ',')." MB";
+    }
+
+    function kbytes_to_gb_string($kb)
+    {
+        $bytes = $kb * 1024;
+        $gigabytes = $bytes / (1000 * 1000 * 1000);
+
+        return number_format($gigabytes, 2, '.', '')." GB";
+    }
+
     function write_summary()
     {
         global $summary,$top,$day,$hour,$month;
@@ -165,10 +181,18 @@
         print "<table width=\"100%\" cellspacing=\"0\">\n";
         print "<caption>$caption</caption>\n";
         print "<tr>";
-        print "<th class=\"label\" style=\"width:120px;\">&nbsp;</th>";
-        print "<th class=\"label\">".T('In')."</th>";
-        print "<th class=\"label\">".T('Out')."</th>";
-        print "<th class=\"label\">".T('Total')."</th>";
+        print "<th class=\"label\" style=\"width:120px;\" rowspan=\"2\">&nbsp;</th>";
+        print "<th class=\"label\" colspan=\"2\">".T('In')."</th>";
+        print "<th class=\"label\" colspan=\"2\">".T('Out')."</th>";
+        print "<th class=\"label\" colspan=\"2\">".T('Total')."</th>";
+        print "</tr>\n";
+        print "<tr>";
+        print "<th class=\"label\">MB</th>";
+        print "<th class=\"label\">GB</th>";
+        print "<th class=\"label\">MB</th>";
+        print "<th class=\"label\">GB</th>";
+        print "<th class=\"label\">MB</th>";
+        print "<th class=\"label\">GB</th>";
         print "</tr>\n";
 
         for ($i=0; $i<count($tab); $i++)
@@ -176,15 +200,21 @@
             if ($tab[$i]['act'] == 1)
             {
                 $t = $tab[$i]['label'];
-                $rx = kbytes_to_string($tab[$i]['rx']);
-                $tx = kbytes_to_string($tab[$i]['tx']);
-                $total = kbytes_to_string($tab[$i]['rx']+$tab[$i]['tx']);
+                $rx_mb = kbytes_to_mb_string($tab[$i]['rx']);
+                $rx_gb = kbytes_to_gb_string($tab[$i]['rx']);
+                $tx_mb = kbytes_to_mb_string($tab[$i]['tx']);
+                $tx_gb = kbytes_to_gb_string($tab[$i]['tx']);
+                $total_mb = kbytes_to_mb_string($tab[$i]['rx']+$tab[$i]['tx']);
+                $total_gb = kbytes_to_gb_string($tab[$i]['rx']+$tab[$i]['tx']);
                 $id = ($i & 1) ? 'odd' : 'even';
                 print "<tr>";
                 print "<td class=\"label_$id\">$t</td>";
-                print "<td class=\"numeric_$id\">$rx</td>";
-                print "<td class=\"numeric_$id\">$tx</td>";
-                print "<td class=\"numeric_$id\">$total</td>";
+                print "<td class=\"numeric_$id\">$rx_mb</td>";
+                print "<td class=\"numeric_$id\">$rx_gb</td>";
+                print "<td class=\"numeric_$id\">$tx_mb</td>";
+                print "<td class=\"numeric_$id\">$tx_gb</td>";
+                print "<td class=\"numeric_$id\">$total_mb</td>";
+                print "<td class=\"numeric_$id\">$total_gb</td>";
                 print "</tr>\n";
              }
         }
