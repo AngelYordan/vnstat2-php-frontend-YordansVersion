@@ -24,11 +24,12 @@ a[href]:focus {
     margin: 0 auto;
     display: flex;
     gap: 20px;
-    align-items: flex-start;
+    align-items: stretch;
 }
 
 #sidebar {
     width: 220px;
+    align-self: stretch;
     background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
     border: 1px solid #374151;
     border-radius: 14px;
