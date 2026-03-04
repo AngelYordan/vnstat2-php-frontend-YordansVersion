@@ -30,31 +30,64 @@ a[href]:focus {
 #sidebar {
     width: 220px;
     align-self: stretch;
-    background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
-    border: 1px solid #374151;
-    border-radius: 14px;
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.25);
+    background:
+        radial-gradient(circle at 1px 1px, rgba(56, 189, 248, 0.14) 1px, transparent 0),
+        linear-gradient(180deg, #081229 0%, #050b1d 100%);
+    background-size: 9px 9px, cover;
+    border: 1px solid rgba(30, 64, 175, 0.55);
+    border-radius: 0;
+    box-shadow: 0 14px 26px rgba(2, 6, 23, 0.65);
     overflow: hidden;
     position: relative;
-}
-
-#sidebar::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 6px;
-    height: 100%;
-    background: #9ca3af;
+    padding: 18px 0;
 }
 
 #sidebar ul.iface {
     margin: 0;
-    padding: 10px;
+    padding: 0;
     list-style: none;
 }
 
-#sidebar li.iface ul {
+#sidebar li.iface {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    font-size: 1.22em;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+#sidebar li.iface > a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 22px;
+    color: #f8fafc;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    transition: transform 0.16s ease, color 0.16s ease;
+}
+
+#sidebar li.iface > a:hover,
+#sidebar li.iface > a:focus {
+    color: #bfdbfe;
+    transform: translateX(4px);
+    text-decoration: none;
+}
+
+#sidebar li.iface > a::before {
+    content: '◉';
+    font-size: 0.62em;
+    color: #e2e8f0;
+    width: 16px;
+    flex: 0 0 16px;
+    text-align: center;
+}
+
+#sidebar ul.page {
+    margin: 0;
+    padding: 0 0 4px;
+    list-style: none;
     display: none;
 }
 
@@ -63,69 +96,36 @@ a[href]:focus {
     display: block;
 }
 
-#sidebar li.iface {
-    margin: 0 0 8px 0;
-    padding: 10px 10px 6px;
-    border-radius: 10px;
-    list-style-type: none;
-    font-size: 13px;
-    font-weight: 600;
-    background: rgba(148, 163, 184, 0.14);
-    color: #e5e7eb;
-}
-
-#sidebar li.iface.active {
-    background: rgba(30, 41, 59, 0.9);
-}
-
-#sidebar a {
-    font-size: 1em;
-    font-weight: 600;
-    color: #dbeafe;
-}
-
-#sidebar ul.page {
-    margin: 10px 0 0;
-    padding: 10px;
-    border-top: 1px solid rgba(148, 163, 184, 0.4);
-    background: rgba(15, 23, 42, 0.75);
-    border-radius: 10px;
-    display: grid;
-    gap: 6px;
-}
-
 #sidebar li.page {
     margin: 0;
     padding: 0;
     list-style-type: none;
-    font-size: 0.83em;
-    font-weight: 500;
-    text-align: left;
-    color: #e5e7eb;
+    font-size: 1.15em;
+    font-weight: 700;
 }
 
 #sidebar li.page a {
     display: block;
-    padding: 7px 9px;
-    border-radius: 8px;
-    color: #e2e8f0;
-    background: rgba(51, 65, 85, 0.8);
-    border: 1px solid transparent;
-    transition: all 0.2s ease;
+    padding: 10px 22px 10px 48px;
+    color: rgba(248, 250, 252, 0.95);
+    text-decoration: none;
+    position: relative;
+    transition: color 0.16s ease, transform 0.16s ease;
+}
+
+#sidebar li.page a::before {
+    content: '-';
+    position: absolute;
+    left: 24px;
+    color: rgba(203, 213, 225, 0.86);
 }
 
 #sidebar li.page a:hover,
-#sidebar li.page a:focus {
-    background: rgba(100, 116, 139, 0.8);
-    color: #ffffff;
-    border-color: rgba(226, 232, 240, 0.4);
-    text-decoration: none;
-}
-
+#sidebar li.page a:focus,
 #sidebar li.page.active a {
     color: #ffffff;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.28);
+    transform: translateX(4px);
+    text-decoration: none;
 }
 
 #content {
