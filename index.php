@@ -222,7 +222,55 @@
         print "</table>\n";
     }
 
+    function parse_iso_date($date_value)
+    {
+        if (!is_string($date_value) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_value)) {
+            return false;
+        }
+
+        $dt = DateTime::createFromFormat('Y-m-d', $date_value);
+        if ($dt === false || $dt->format('Y-m-d') !== $date_value) {
+            return false;
+        }
+
+        return mktime(0, 0, 0, (int)$dt->format('m'), (int)$dt->format('d'), (int)$dt->format('Y'));
+    }
+
+    function filter_days_between($days, $from_ts, $to_ts)
+    {
+        $filtered = array();
+
+        for ($i=0; $i<count($days); $i++)
+        {
+            if (!isset($days[$i]['time']) || $days[$i]['time'] < $from_ts || $days[$i]['time'] > $to_ts) {
+                continue;
+            }
+            $filtered[] = $days[$i];
+        }
+
+        return $filtered;
+    }
+
     get_vnstat_data();
+
+    $from_date = isset($_GET['from_date']) ? $_GET['from_date'] : '';
+    $to_date = isset($_GET['to_date']) ? $_GET['to_date'] : '';
+    $custom_day_range = array();
+    $custom_day_error = '';
+
+    if ($page == 'd' && ($from_date !== '' || $to_date !== ''))
+    {
+        $from_ts = parse_iso_date($from_date);
+        $to_ts = parse_iso_date($to_date);
+
+        if ($from_ts === false || $to_ts === false) {
+            $custom_day_error = 'Selecciona ambas fechas en formato válido.';
+        } elseif ($from_ts > $to_ts) {
+            $custom_day_error = 'La fecha inicial no puede ser mayor que la final.';
+        } else {
+            $custom_day_range = filter_days_between($day_all, $from_ts, $to_ts);
+        }
+    }
 
     //
     // html start
@@ -250,6 +298,25 @@
     <div id="header"><?php print T('Traffic data for').(isset($iface_title[$iface]) ? $iface_title[$iface] : '')." ($iface)";?></div>
     <div id="main">
     <?php
+    if ($page == 'd')
+    {
+        print "<form id=\"date-range-form\" method=\"get\" action=\"$script\">\n";
+        print "<input type=\"hidden\" name=\"if\" value=\"".htmlspecialchars($iface, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<input type=\"hidden\" name=\"page\" value=\"".htmlspecialchars($page, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<input type=\"hidden\" name=\"graph\" value=\"".htmlspecialchars($graph, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<input type=\"hidden\" name=\"style\" value=\"".htmlspecialchars($style, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<div class=\"date-field\"><label for=\"from_date\">From Date</label><input id=\"from_date\" name=\"from_date\" type=\"date\" value=\"".htmlspecialchars($from_date, ENT_QUOTES, 'UTF-8')."\"/></div>\n";
+        print "<div class=\"date-field\"><label for=\"to_date\">To Date</label><input id=\"to_date\" name=\"to_date\" type=\"date\" value=\"".htmlspecialchars($to_date, ENT_QUOTES, 'UTF-8')."\"/></div>\n";
+        print "<button type=\"submit\">Buscar</button>\n";
+        print "</form>\n";
+
+        if ($custom_day_error !== '') {
+            print "<div class=\"date-range-message error\">$custom_day_error</div>\n";
+        } elseif (($from_date !== '' || $to_date !== '') && count($custom_day_range) === 0) {
+            print "<div class=\"date-range-message\">No hay datos para el rango seleccionado.</div>\n";
+        }
+    }
+
     $graph_params = "if=$iface&amp;page=$page&amp;style=$style";
     if ($page != 's')
         if ($graph_format == 'svg') {
@@ -268,7 +335,12 @@
     }
     else if ($page == 'd')
     {
-        write_data_table(T('Last 30 days'), $day);
+        if (count($custom_day_range) > 0) {
+            write_data_table('Días en el rango seleccionado', $custom_day_range);
+        }
+        else if ($from_date === '' && $to_date === '') {
+            write_data_table(T('Last 30 days'), $day);
+        }
     }
     else if ($page == 'm')
     {

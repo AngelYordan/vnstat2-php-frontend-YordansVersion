@@ -93,7 +93,7 @@
     function get_vnstat_data($use_label=true)
     {
         global $iface, $vnstat_bin, $data_dir;
-        global $hour,$day,$month,$top,$summary;
+        global $hour,$day,$day_all,$month,$top,$summary;
 
         $vnstat_data = array();
         if (!isset($vnstat_bin) || $vnstat_bin == '')
@@ -122,6 +122,7 @@
         $day = array();
         $hour = array();
         $month = array();
+        $day_all = array();
         $top = array();
 
         if (!isset($vnstat_data) || !isset($vnstat_data['vnstatversion'])) {
@@ -152,18 +153,22 @@
         // per-day data
         // FIXME: instead of using array_reverse, sorting by date/time keys would be more reliable
         $day_data = array_reverse($traffic_data['day']);
-        for($i = 0; $i < min(30, count($day_data)); $i++) {
+        for($i = 0; $i < count($day_data); $i++) {
             $d = $day_data[$i];
             $ts = mktime(0, 0, 0, $d['date']['month'], $d['date']['day'], $d['date']['year']);
 
-            $day[$i]['time'] = $ts;
-            $day[$i]['rx'] = $d['rx'] / 1024;
-            $day[$i]['tx'] = $d['tx'] / 1024;
-            $day[$i]['act'] = 1;
+            $day_all[$i]['time'] = $ts;
+            $day_all[$i]['rx'] = $d['rx'] / 1024;
+            $day_all[$i]['tx'] = $d['tx'] / 1024;
+            $day_all[$i]['act'] = 1;
 
             if($use_label) {
-                $day[$i]['label'] = strftime(T('datefmt_days'), $ts);
-                $day[$i]['img_label'] = strftime(T('datefmt_days_img'), $ts);
+                $day_all[$i]['label'] = strftime(T('datefmt_days'), $ts);
+                $day_all[$i]['img_label'] = strftime(T('datefmt_days_img'), $ts);
+            }
+
+            if ($i < 30) {
+                $day[$i] = $day_all[$i];
             }
         }
 
