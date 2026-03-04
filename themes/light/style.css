@@ -71,21 +71,47 @@ a[href]:focus {
 }
 
 #sidebar ul.page {
-    margin: 8px 0 0;
-    padding: 8px;
-    border-top: 1px solid #e5e7eb;
-    background: #ffffff;
-    border-radius: 8px;
+    margin: 10px 0 0;
+    padding: 10px;
+    border-top: 1px solid #dbe3f0;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border-radius: 10px;
+    display: grid;
+    gap: 6px;
 }
 
 #sidebar li.page {
     margin: 0;
-    padding: 6px 4px;
+    padding: 0;
     list-style-type: none;
     font-size: 0.83em;
     font-weight: 500;
     text-align: left;
     color: #111827;
+}
+
+#sidebar li.page a {
+    display: block;
+    padding: 7px 9px;
+    border-radius: 8px;
+    color: #334155;
+    background: #f1f5f9;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+#sidebar li.page a:hover,
+#sidebar li.page a:focus {
+    background: #e2e8f0;
+    color: #0f172a;
+    border-color: #cbd5e1;
+    text-decoration: none;
+}
+
+#sidebar li.page.active a {
+    color: #ffffff;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.28);
 }
 
 #content {
@@ -178,6 +204,15 @@ a[href]:focus {
     background-color: #e5e7eb;
     padding: 10px;
     border-bottom: 1px solid #d1d5db;
+}
+
+
+#main th.gb_col {
+    background-color: #fdf1d9;
+}
+
+#main td.gb_col {
+    background-color: #fff7e7;
 }
 
 #main caption {

@@ -57,7 +57,8 @@
             print "<ul class=\"page\">\n";
             foreach ($page_list as $pg)
             {
-                print "<li class=\"page\"><a href=\"$script?if=$if$p&amp;page=$pg\">".$page_title[$pg]."</a></li>\n";
+                $page_class = ($iface == $if && $page == $pg) ? 'page active' : 'page';
+                print "<li class=\"$page_class\"><a href=\"$script?if=$if$p&amp;page=$pg\">".$page_title[$pg]."</a></li>\n";
             }
             print "</ul></li>\n";
         }
@@ -188,11 +189,11 @@
         print "</tr>\n";
         print "<tr>";
         print "<th class=\"label\">MB</th>";
-        print "<th class=\"label\">GB</th>";
+        print "<th class=\"label gb_col\">GB</th>";
         print "<th class=\"label\">MB</th>";
-        print "<th class=\"label\">GB</th>";
+        print "<th class=\"label gb_col\">GB</th>";
         print "<th class=\"label\">MB</th>";
-        print "<th class=\"label\">GB</th>";
+        print "<th class=\"label gb_col\">GB</th>";
         print "</tr>\n";
 
         for ($i=0; $i<count($tab); $i++)
@@ -210,11 +211,11 @@
                 print "<tr>";
                 print "<td class=\"label_$id\">$t</td>";
                 print "<td class=\"numeric_$id\">$rx_mb</td>";
-                print "<td class=\"numeric_$id\">$rx_gb</td>";
+                print "<td class=\"numeric_$id gb_col\">$rx_gb</td>";
                 print "<td class=\"numeric_$id\">$tx_mb</td>";
-                print "<td class=\"numeric_$id\">$tx_gb</td>";
+                print "<td class=\"numeric_$id gb_col\">$tx_gb</td>";
                 print "<td class=\"numeric_$id\">$total_mb</td>";
-                print "<td class=\"numeric_$id\">$total_gb</td>";
+                print "<td class=\"numeric_$id gb_col\">$total_gb</td>";
                 print "</tr>\n";
              }
         }
