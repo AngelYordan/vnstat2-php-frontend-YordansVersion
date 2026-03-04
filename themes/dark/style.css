@@ -30,11 +30,22 @@ a[href]:focus {
 #sidebar {
     width: 220px;
     align-self: stretch;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+    border: 1px solid #374151;
     border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.25);
     overflow: hidden;
+    position: relative;
+}
+
+#sidebar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 6px;
+    height: 100%;
+    background: #9ca3af;
 }
 
 #sidebar ul.iface {
@@ -59,23 +70,28 @@ a[href]:focus {
     list-style-type: none;
     font-size: 13px;
     font-weight: 600;
-    background: #f8fafc;
+    background: rgba(148, 163, 184, 0.14);
+    color: #e5e7eb;
 }
 
 #sidebar li.iface.active {
-    background: #eff6ff;
+    background: rgba(30, 41, 59, 0.9);
 }
 
 #sidebar a {
     font-size: 1em;
     font-weight: 600;
+    color: #dbeafe;
 }
 
 #sidebar ul.page {
-    margin: 8px 0 0;
-    padding: 6px 0 0;
-    border-top: 1px solid #dbe3f0;
-    background: transparent;
+    margin: 10px 0 0;
+    padding: 10px;
+    border-top: 1px solid rgba(148, 163, 184, 0.4);
+    background: rgba(15, 23, 42, 0.75);
+    border-radius: 10px;
+    display: grid;
+    gap: 6px;
 }
 
 #sidebar li.page {
@@ -85,31 +101,31 @@ a[href]:focus {
     font-size: 0.83em;
     font-weight: 500;
     text-align: left;
-    color: #111827;
+    color: #e5e7eb;
 }
 
 #sidebar li.page a {
     display: block;
-    padding: 8px 10px;
-    border-radius: 0;
-    color: #334155;
-    background: transparent;
-    border: none;
+    padding: 7px 9px;
+    border-radius: 8px;
+    color: #e2e8f0;
+    background: rgba(51, 65, 85, 0.8);
+    border: 1px solid transparent;
     transition: all 0.2s ease;
 }
 
 #sidebar li.page a:hover,
 #sidebar li.page a:focus {
-    background: rgba(148, 163, 184, 0.2);
-    color: #0f172a;
+    background: rgba(100, 116, 139, 0.8);
+    color: #ffffff;
+    border-color: rgba(226, 232, 240, 0.4);
     text-decoration: none;
 }
 
 #sidebar li.page.active a {
-    color: #1d4ed8;
-    background: rgba(37, 99, 235, 0.12);
-    border-left: 3px solid #2563eb;
-    padding-left: 7px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.28);
 }
 
 #content {
