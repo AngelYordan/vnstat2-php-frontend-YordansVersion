@@ -30,16 +30,16 @@ a[href]:focus {
 #sidebar {
     width: 220px;
     align-self: stretch;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    background: #11262d;
+    border: 1px solid #1c3943;
+    border-radius: 0;
+    box-shadow: none;
     overflow: hidden;
 }
 
 #sidebar ul.iface {
     margin: 0;
-    padding: 10px;
+    padding: 0;
     list-style: none;
 }
 
@@ -53,66 +53,76 @@ a[href]:focus {
 }
 
 #sidebar li.iface {
-    margin: 0 0 8px 0;
-    padding: 10px 10px 6px;
-    border-radius: 10px;
+    margin: 0;
+    padding: 0;
     list-style-type: none;
-    font-size: 13px;
-    font-weight: 600;
-    background: #f8fafc;
+    background: transparent;
+    color: #f8fafc;
 }
 
 #sidebar li.iface.active {
-    background: #eff6ff;
+    background: transparent;
 }
 
 #sidebar a {
-    font-size: 1em;
-    font-weight: 600;
+    color: #f8fafc;
+    text-decoration: none;
+}
+
+#sidebar li.iface > a {
+    display: block;
+    padding: 14px 14px;
+    font-size: 28px;
+    font-weight: 700;
+    border-bottom: 1px solid #29434d;
 }
 
 #sidebar ul.page {
-    margin: 10px 0 0;
-    padding: 10px;
-    border-top: 1px solid #dbe3f0;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-    border-radius: 10px;
-    display: grid;
-    gap: 6px;
+    margin: 0;
+    padding: 10px 8px 10px;
+    border-top: none;
+    background: transparent;
+    border-radius: 0;
+    display: block;
 }
 
 #sidebar li.page {
     margin: 0;
     padding: 0;
     list-style-type: none;
-    font-size: 0.83em;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: 600;
     text-align: left;
-    color: #111827;
+    color: #f8fafc;
+}
+
+#sidebar li.page + li.page {
+    margin-top: 2px;
 }
 
 #sidebar li.page a {
     display: block;
-    padding: 7px 9px;
-    border-radius: 8px;
-    color: #334155;
-    background: #f1f5f9;
-    border: 1px solid transparent;
-    transition: all 0.2s ease;
+    padding: 10px 12px;
+    border-radius: 4px;
+    color: #f8fafc;
+    background: transparent;
+    border: none;
+    font-size: 1em;
+    transition: background-color 0.2s ease;
 }
 
 #sidebar li.page a:hover,
 #sidebar li.page a:focus {
-    background: #e2e8f0;
-    color: #0f172a;
-    border-color: #cbd5e1;
+    background: #1a3b46;
+    color: #ffffff;
     text-decoration: none;
 }
 
 #sidebar li.page.active a {
     color: #ffffff;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.28);
+    background: linear-gradient(180deg, #2b6cff 0%, #1f57db 100%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    font-weight: 700;
 }
 
 #content {
