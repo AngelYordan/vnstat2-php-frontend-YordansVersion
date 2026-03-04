@@ -29,11 +29,22 @@ a[href]:focus {
 
 #sidebar {
     width: 220px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+    border: 1px solid #374151;
     border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.25);
     overflow: hidden;
+    position: relative;
+}
+
+#sidebar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 6px;
+    height: 100%;
+    background: #9ca3af;
 }
 
 #sidebar ul.iface {
@@ -58,23 +69,25 @@ a[href]:focus {
     list-style-type: none;
     font-size: 13px;
     font-weight: 600;
-    background: #f8fafc;
+    background: rgba(148, 163, 184, 0.14);
+    color: #e5e7eb;
 }
 
 #sidebar li.iface.active {
-    background: #eff6ff;
+    background: rgba(30, 41, 59, 0.9);
 }
 
 #sidebar a {
     font-size: 1em;
     font-weight: 600;
+    color: #dbeafe;
 }
 
 #sidebar ul.page {
     margin: 10px 0 0;
     padding: 10px;
-    border-top: 1px solid #dbe3f0;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border-top: 1px solid rgba(148, 163, 184, 0.4);
+    background: rgba(15, 23, 42, 0.75);
     border-radius: 10px;
     display: grid;
     gap: 6px;
@@ -87,24 +100,24 @@ a[href]:focus {
     font-size: 0.83em;
     font-weight: 500;
     text-align: left;
-    color: #111827;
+    color: #e5e7eb;
 }
 
 #sidebar li.page a {
     display: block;
     padding: 7px 9px;
     border-radius: 8px;
-    color: #334155;
-    background: #f1f5f9;
+    color: #e2e8f0;
+    background: rgba(51, 65, 85, 0.8);
     border: 1px solid transparent;
     transition: all 0.2s ease;
 }
 
 #sidebar li.page a:hover,
 #sidebar li.page a:focus {
-    background: #e2e8f0;
-    color: #0f172a;
-    border-color: #cbd5e1;
+    background: rgba(100, 116, 139, 0.8);
+    color: #ffffff;
+    border-color: rgba(226, 232, 240, 0.4);
     text-decoration: none;
 }
 
@@ -122,7 +135,7 @@ a[href]:focus {
 #live-traffic-panel {
     position: static;
     margin-bottom: 16px;
-    padding: 12px 16px;
+    padding: 14px 16px;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
     background: #ffffff;
@@ -136,13 +149,22 @@ a[href]:focus {
 }
 
 #live-traffic-panel .metric {
-    margin: 2px 0;
+    margin: 8px 0 0;
     font-size: 1.03em;
     font-weight: 600;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
 }
 
-#live-rx { color: #dc2626; }
-#live-tx { color: #16a34a; }
+#live-rx {
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+
+#live-tx {
+    background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+}
 
 #live-status {
     margin-top: 6px;
