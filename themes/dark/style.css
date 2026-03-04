@@ -30,27 +30,16 @@ a[href]:focus {
 #sidebar {
     width: 220px;
     align-self: stretch;
-    background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
-    border: 1px solid #374151;
-    border-radius: 14px;
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.25);
+    background: #0b2239;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
     overflow: hidden;
-    position: relative;
-}
-
-#sidebar::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 6px;
-    height: 100%;
-    background: #9ca3af;
 }
 
 #sidebar ul.iface {
     margin: 0;
-    padding: 10px;
+    padding: 18px 18px 16px;
     list-style: none;
 }
 
@@ -64,68 +53,68 @@ a[href]:focus {
 }
 
 #sidebar li.iface {
-    margin: 0 0 8px 0;
-    padding: 10px 10px 6px;
-    border-radius: 10px;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
     list-style-type: none;
-    font-size: 13px;
+    font-size: 18px;
     font-weight: 600;
-    background: rgba(148, 163, 184, 0.14);
-    color: #e5e7eb;
+    background: transparent;
+    color: #f1f5f9;
 }
 
 #sidebar li.iface.active {
-    background: rgba(30, 41, 59, 0.9);
+    background: transparent;
 }
 
 #sidebar a {
     font-size: 1em;
-    font-weight: 600;
-    color: #dbeafe;
+    font-weight: 500;
+    color: #f8fafc;
 }
 
 #sidebar ul.page {
-    margin: 10px 0 0;
-    padding: 10px;
-    border-top: 1px solid rgba(148, 163, 184, 0.4);
-    background: rgba(15, 23, 42, 0.75);
-    border-radius: 10px;
-    display: grid;
-    gap: 6px;
+    margin: 20px 0 0;
+    padding: 0;
+    border-top: none;
+    background: transparent;
+    border-radius: 0;
+    display: block;
 }
 
 #sidebar li.page {
-    margin: 0;
+    margin: 0 0 12px;
     padding: 0;
     list-style-type: none;
-    font-size: 0.83em;
+    font-size: 20px;
     font-weight: 500;
     text-align: left;
-    color: #e5e7eb;
+    color: #f8fafc;
 }
 
 #sidebar li.page a {
     display: block;
-    padding: 7px 9px;
-    border-radius: 8px;
-    color: #e2e8f0;
-    background: rgba(51, 65, 85, 0.8);
-    border: 1px solid transparent;
-    transition: all 0.2s ease;
+    padding: 4px 0;
+    border-radius: 0;
+    color: #f8fafc;
+    background: transparent;
+    border: none;
+    font-size: 1em;
+    transition: color 0.2s ease;
 }
 
 #sidebar li.page a:hover,
 #sidebar li.page a:focus {
-    background: rgba(100, 116, 139, 0.8);
+    background: transparent;
     color: #ffffff;
-    border-color: rgba(226, 232, 240, 0.4);
     text-decoration: none;
 }
 
 #sidebar li.page.active a {
     color: #ffffff;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.28);
+    background: transparent;
+    box-shadow: none;
+    font-weight: 700;
 }
 
 #content {
