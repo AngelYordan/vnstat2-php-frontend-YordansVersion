@@ -30,8 +30,8 @@ a[href]:focus {
 #sidebar {
     width: 220px;
     align-self: stretch;
-    background: #0b2239;
-    border: none;
+    background: #11262d;
+    border: 1px solid #1c3943;
     border-radius: 0;
     box-shadow: none;
     overflow: hidden;
@@ -39,7 +39,7 @@ a[href]:focus {
 
 #sidebar ul.iface {
     margin: 0;
-    padding: 18px 18px 16px;
+    padding: 0;
     list-style: none;
 }
 
@@ -55,12 +55,9 @@ a[href]:focus {
 #sidebar li.iface {
     margin: 0;
     padding: 0;
-    border-radius: 0;
     list-style-type: none;
-    font-size: 18px;
-    font-weight: 600;
     background: transparent;
-    color: #f1f5f9;
+    color: #f8fafc;
 }
 
 #sidebar li.iface.active {
@@ -68,14 +65,21 @@ a[href]:focus {
 }
 
 #sidebar a {
-    font-size: 1em;
-    font-weight: 500;
     color: #f8fafc;
+    text-decoration: none;
+}
+
+#sidebar li.iface > a {
+    display: block;
+    padding: 14px 14px;
+    font-size: 28px;
+    font-weight: 700;
+    border-bottom: 1px solid #29434d;
 }
 
 #sidebar ul.page {
-    margin: 20px 0 0;
-    padding: 0;
+    margin: 0;
+    padding: 10px 8px 10px;
     border-top: none;
     background: transparent;
     border-radius: 0;
@@ -83,37 +87,41 @@ a[href]:focus {
 }
 
 #sidebar li.page {
-    margin: 0 0 12px;
+    margin: 0;
     padding: 0;
     list-style-type: none;
-    font-size: 24px;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: 600;
     text-align: left;
     color: #f8fafc;
 }
 
+#sidebar li.page + li.page {
+    margin-top: 2px;
+}
+
 #sidebar li.page a {
     display: block;
-    padding: 4px 0;
-    border-radius: 0;
+    padding: 10px 12px;
+    border-radius: 4px;
     color: #f8fafc;
     background: transparent;
     border: none;
-    font-size: 1.08em;
-    transition: color 0.2s ease;
+    font-size: 1em;
+    transition: background-color 0.2s ease;
 }
 
 #sidebar li.page a:hover,
 #sidebar li.page a:focus {
-    background: transparent;
+    background: #1a3b46;
     color: #ffffff;
     text-decoration: none;
 }
 
 #sidebar li.page.active a {
     color: #ffffff;
-    background: transparent;
-    box-shadow: none;
+    background: linear-gradient(180deg, #2b6cff 0%, #1f57db 100%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
     font-weight: 700;
 }
 
