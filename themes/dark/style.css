@@ -72,13 +72,10 @@ a[href]:focus {
 }
 
 #sidebar ul.page {
-    margin: 10px 0 0;
-    padding: 10px;
+    margin: 8px 0 0;
+    padding: 6px 0 0;
     border-top: 1px solid #dbe3f0;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-    border-radius: 10px;
-    display: grid;
-    gap: 6px;
+    background: transparent;
 }
 
 #sidebar li.page {
@@ -93,26 +90,26 @@ a[href]:focus {
 
 #sidebar li.page a {
     display: block;
-    padding: 7px 9px;
-    border-radius: 8px;
+    padding: 8px 10px;
+    border-radius: 0;
     color: #334155;
-    background: #f1f5f9;
-    border: 1px solid transparent;
+    background: transparent;
+    border: none;
     transition: all 0.2s ease;
 }
 
 #sidebar li.page a:hover,
 #sidebar li.page a:focus {
-    background: #e2e8f0;
+    background: rgba(148, 163, 184, 0.2);
     color: #0f172a;
-    border-color: #cbd5e1;
     text-decoration: none;
 }
 
 #sidebar li.page.active a {
-    color: #ffffff;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.28);
+    color: #1d4ed8;
+    background: rgba(37, 99, 235, 0.12);
+    border-left: 3px solid #2563eb;
+    padding-left: 7px;
 }
 
 #content {
