@@ -31,18 +31,18 @@
     $language = 'es';
 
     // Set local timezone
-    date_default_timezone_set("Europe/Amsterdam");
+    date_default_timezone_set("America/Lima");
 
     // list of network interfaces monitored by vnStat
-    $iface_list = array('enp3s0f1');
+    $iface_list = array('eth0','eth1');
 
     //
     // optional names for interfaces
     // if there's no name set for an interface then the interface identifier
     // will be displayed instead
     //
-    $iface_title['enp3s0f1'] = ' Conexion Ethernet';
-
+    $iface_title['eth0'] = ' LAN 1';
+    $iface_title['eth1'] = ' LAN 2';
     //
     // There are two possible sources for vnstat data. If the $vnstat_bin
     // variable is set then vnstat is called directly from the PHP script
