@@ -53,6 +53,103 @@
     //
     // functions
     //
+    function strftime_to_icu_pattern($format)
+    {
+        $map = array(
+            '%a' => 'EEE',
+            '%b' => 'MMM',
+            '%B' => 'MMMM',
+            '%d' => 'dd',
+            '%H' => 'HH',
+            '%k' => 'H',
+            '%l' => 'h',
+            '%m' => 'MM',
+            '%M' => 'mm',
+            '%p' => 'a',
+            '%Y' => 'yyyy',
+            '%%' => '%',
+        );
+
+        $pattern = '';
+        $literal = '';
+        $length = strlen($format);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $format[$i];
+
+            if ($char === '%' && $i + 1 < $length) {
+                $token = '%' . $format[$i + 1];
+
+                if (isset($map[$token])) {
+                    if ($literal !== '') {
+                        $pattern .= "'" . str_replace("'", "''", $literal) . "'";
+                        $literal = '';
+                    }
+
+                    $pattern .= $map[$token];
+                    $i++;
+                    continue;
+                }
+            }
+
+            $literal .= $char;
+        }
+
+        if ($literal !== '') {
+            $pattern .= "'" . str_replace("'", "''", $literal) . "'";
+        }
+
+        return $pattern;
+    }
+
+
+    function strftime_compat($format, $timestamp)
+    {
+        global $locale;
+
+        if (class_exists('IntlDateFormatter')) {
+            $intl_locale = preg_replace('/\..*$/', '', (string)$locale);
+            if ($intl_locale === null || $intl_locale === '') {
+                $intl_locale = 'en_US';
+            }
+
+            $pattern = strftime_to_icu_pattern($format);
+            $formatter = new IntlDateFormatter(
+                $intl_locale,
+                IntlDateFormatter::NONE,
+                IntlDateFormatter::NONE,
+                date_default_timezone_get(),
+                IntlDateFormatter::GREGORIAN,
+                $pattern
+            );
+
+            if ($formatter !== false) {
+                $formatted = $formatter->format($timestamp);
+                if ($formatted !== false) {
+                    return $formatted;
+                }
+            }
+        }
+
+        $php_format = strtr($format, array(
+            '%a' => 'D',
+            '%b' => 'M',
+            '%B' => 'F',
+            '%d' => 'd',
+            '%H' => 'H',
+            '%k' => 'G',
+            '%l' => 'g',
+            '%m' => 'm',
+            '%M' => 'i',
+            '%p' => 'A',
+            '%Y' => 'Y',
+            '%%' => '%',
+        ));
+
+        return date($php_format, $timestamp);
+    }
+
+
     function validate_input()
     {
         global $page,  $page_list;
@@ -163,8 +260,8 @@
             $day_all[$i]['act'] = 1;
 
             if($use_label) {
-                $day_all[$i]['label'] = strftime(T('datefmt_days'), $ts);
-                $day_all[$i]['img_label'] = strftime(T('datefmt_days_img'), $ts);
+                $day_all[$i]['label'] = strftime_compat(T('datefmt_days'), $ts);
+                $day_all[$i]['img_label'] = strftime_compat(T('datefmt_days_img'), $ts);
             }
 
             if ($i < 30) {
@@ -184,8 +281,8 @@
             $month[$i]['act'] = 1;
 
             if($use_label) {
-                $month[$i]['label'] = strftime(T('datefmt_months'), $ts);
-                $month[$i]['img_label'] = strftime(T('datefmt_months_img'), $ts);
+                $month[$i]['label'] = strftime_compat(T('datefmt_months'), $ts);
+                $month[$i]['img_label'] = strftime_compat(T('datefmt_months_img'), $ts);
             }
         }
 
@@ -201,8 +298,8 @@
             $hour[$i]['act'] = 1;
 
             if($use_label) {
-                $hour[$i]['label'] = strftime(T('datefmt_hours'), $ts);
-                $hour[$i]['img_label'] = strftime(T('datefmt_hours_img'), $ts);
+                $hour[$i]['label'] = strftime_compat(T('datefmt_hours'), $ts);
+                $hour[$i]['img_label'] = strftime_compat(T('datefmt_hours_img'), $ts);
             }
         }
 
@@ -218,7 +315,7 @@
             $top[$i]['act'] = 1;
 
             if($use_label) {
-                $top[$i]['label'] = strftime(T('datefmt_top'), $ts);
+                $top[$i]['label'] = strftime_compat(T('datefmt_top'), $ts);
                 $top[$i]['img_label'] = '';
             }
         }
