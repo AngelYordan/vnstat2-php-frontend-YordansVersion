@@ -418,7 +418,7 @@
   }
 
   updatePanel();
-  setInterval(updatePanel, 500);
+  setInterval(updatePanel, 1200);
 })();
 </script>
 
