@@ -538,6 +538,9 @@
         print "<input type=\"hidden\" name=\"page\" value=\"".htmlspecialchars($page, ENT_QUOTES, 'UTF-8')."\"/>\n";
         print "<input type=\"hidden\" name=\"graph\" value=\"".htmlspecialchars($graph, ENT_QUOTES, 'UTF-8')."\"/>\n";
         print "<input type=\"hidden\" name=\"style\" value=\"".htmlspecialchars($style, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<input type=\"hidden\" name=\"show_rx\" value=\"".htmlspecialchars($show_rx, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<input type=\"hidden\" name=\"show_tx\" value=\"".htmlspecialchars($show_tx, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<input type=\"hidden\" name=\"show_total\" value=\"".htmlspecialchars($show_total, ENT_QUOTES, 'UTF-8')."\"/>\n";
         print "<div class=\"date-field\"><label for=\"from_date\">From Date</label><input id=\"from_date\" name=\"from_date\" type=\"date\" value=\"".htmlspecialchars($from_date, ENT_QUOTES, 'UTF-8')."\"/></div>\n";
         print "<div class=\"date-field\"><label for=\"to_date\">To Date</label><input id=\"to_date\" name=\"to_date\" type=\"date\" value=\"".htmlspecialchars($to_date, ENT_QUOTES, 'UTF-8')."\"/></div>\n";
         print "<button type=\"submit\">Buscar</button>\n";
@@ -551,25 +554,37 @@
     }
 
     $graph_params = "if=$iface&amp;page=$page&amp;style=$style&amp;show_rx=$show_rx&amp;show_tx=$show_tx&amp;show_total=$show_total";
+    if ($page == 'd') {
+        $graph_params .= "&amp;from_date=".rawurlencode($from_date)."&amp;to_date=".rawurlencode($to_date);
+    }
     if ($page == 'h' || $page == 'd' || $page == 'm')
     {
+        print "<div style=\"display:flex; align-items:flex-start; gap:18px;\">\n";
+        print "<div>\n";
+        
+        if ($graph_format == 'svg') {
+	     print "<object type=\"image/svg+xml\" width=\"692\" height=\"370\" data=\"graph_svg.php?$graph_params\"></object>\n";
+        } else {
+	     print "<img src=\"graph.php?$graph_params\" alt=\"graph\"/>\n";
+        }
+        print "</div>\n";
+
         print "<form id=\"graph-series-form\" method=\"get\" action=\"$script\">\n";
         print "<input type=\"hidden\" name=\"if\" value=\"".htmlspecialchars($iface, ENT_QUOTES, 'UTF-8')."\"/>\n";
         print "<input type=\"hidden\" name=\"page\" value=\"".htmlspecialchars($page, ENT_QUOTES, 'UTF-8')."\"/>\n";
         print "<input type=\"hidden\" name=\"graph\" value=\"".htmlspecialchars($graph, ENT_QUOTES, 'UTF-8')."\"/>\n";
         print "<input type=\"hidden\" name=\"style\" value=\"".htmlspecialchars($style, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        if ($page == 'd') {
+            print "<input type=\"hidden\" name=\"from_date\" value=\"".htmlspecialchars($from_date, ENT_QUOTES, 'UTF-8')."\"/>\n";
+            print "<input type=\"hidden\" name=\"to_date\" value=\"".htmlspecialchars($to_date, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        }
 
         print "<div class=\"date-field\"><input type=\"hidden\" name=\"show_rx\" value=\"0\"/><label><input type=\"checkbox\" name=\"show_rx\" value=\"1\"".($show_rx === '1' ? ' checked="checked"' : '')."/> Entrada</label></div>\n";
         print "<div class=\"date-field\"><input type=\"hidden\" name=\"show_tx\" value=\"0\"/><label><input type=\"checkbox\" name=\"show_tx\" value=\"1\"".($show_tx === '1' ? ' checked="checked"' : '')."/> Salida</label></div>\n";
         print "<div class=\"date-field\"><input type=\"hidden\" name=\"show_total\" value=\"0\"/><label><input type=\"checkbox\" name=\"show_total\" value=\"1\"".($show_total === '1' ? ' checked="checked"' : '')."/> Total</label></div>\n";
         print "<button type=\"submit\">Aplicar gráfico</button>\n";
         print "</form>\n";
-
-        if ($graph_format == 'svg') {
-	     print "<object type=\"image/svg+xml\" width=\"692\" height=\"370\" data=\"graph_svg.php?$graph_params\"></object>\n";
-        } else {
-	     print "<img src=\"graph.php?$graph_params\" alt=\"graph\"/>\n";
-        }
+        print "</div>\n";
     }
 
     if ($page == 's')

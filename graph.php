@@ -33,6 +33,38 @@
 	return imagecolorallocatealpha($im, $colors[0], $colors[1], $colors[2], $colors[3]);
     }
 
+    function parse_graph_date($value)
+    {
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            return false;
+        }
+
+        $parts = explode('-', $value);
+        $year = (int)$parts[0];
+        $month = (int)$parts[1];
+        $day = (int)$parts[2];
+
+        if (!checkdate($month, $day, $year)) {
+            return false;
+        }
+
+        return mktime(0, 0, 0, $month, $day, $year);
+    }
+
+    function filter_graph_days_between($rows, $from_ts, $to_ts)
+    {
+        $result = array();
+        for ($i = 0; $i < count($rows); $i++) {
+            if (!isset($rows[$i]['time'])) {
+                continue;
+            }
+            if ($rows[$i]['time'] >= $from_ts && $rows[$i]['time'] <= $to_ts) {
+                $result[] = $rows[$i];
+            }
+        }
+        return $result;
+    }
+
     function init_image()
     {
         global $im, $xlm, $xrm, $ytm, $ybm, $iw, $ih,$graph, $cl, $iface, $colorscheme, $style;
@@ -299,7 +331,20 @@
         }
         else if ($page == 'd')
         {
-            draw_data($day);
+            $from_date = isset($_GET['from_date']) ? $_GET['from_date'] : '';
+            $to_date = isset($_GET['to_date']) ? $_GET['to_date'] : '';
+            $day_data = $day;
+
+            if ($from_date !== '' && $to_date !== '') {
+                $from_ts = parse_graph_date($from_date);
+                $to_ts = parse_graph_date($to_date);
+
+                if ($from_ts !== false && $to_ts !== false && $from_ts <= $to_ts) {
+                    $day_data = filter_graph_days_between($day, $from_ts, $to_ts + 86399);
+                }
+            }
+
+            draw_data($day_data);
         }
         else if ($page == 'm')
         {
