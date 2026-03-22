@@ -30,11 +30,11 @@
 
     function write_side_bar()
     {
-        global $iface, $page, $graph, $script, $style;
+        global $iface, $page, $graph, $script, $style, $show_rx, $show_tx, $show_total;
         global $iface_list, $iface_title;
         global $page_list, $page_title;
 
-        $p = "&amp;graph=$graph&amp;style=$style";
+        $p = "&amp;graph=$graph&amp;style=$style&amp;show_rx=$show_rx&amp;show_tx=$show_tx&amp;show_total=$show_total";
 
         print "<ul class=\"iface\">\n";
         foreach ($iface_list as $if)
@@ -550,13 +550,27 @@
         }
     }
 
-    $graph_params = "if=$iface&amp;page=$page&amp;style=$style";
+    $graph_params = "if=$iface&amp;page=$page&amp;style=$style&amp;show_rx=$show_rx&amp;show_tx=$show_tx&amp;show_total=$show_total";
     if ($page == 'h' || $page == 'd' || $page == 'm')
+    {
+        print "<form id=\"graph-series-form\" method=\"get\" action=\"$script\">\n";
+        print "<input type=\"hidden\" name=\"if\" value=\"".htmlspecialchars($iface, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<input type=\"hidden\" name=\"page\" value=\"".htmlspecialchars($page, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<input type=\"hidden\" name=\"graph\" value=\"".htmlspecialchars($graph, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<input type=\"hidden\" name=\"style\" value=\"".htmlspecialchars($style, ENT_QUOTES, 'UTF-8')."\"/>\n";
+
+        print "<div class=\"date-field\"><input type=\"hidden\" name=\"show_rx\" value=\"0\"/><label><input type=\"checkbox\" name=\"show_rx\" value=\"1\"".($show_rx === '1' ? ' checked="checked"' : '')."/> Entrada</label></div>\n";
+        print "<div class=\"date-field\"><input type=\"hidden\" name=\"show_tx\" value=\"0\"/><label><input type=\"checkbox\" name=\"show_tx\" value=\"1\"".($show_tx === '1' ? ' checked="checked"' : '')."/> Salida</label></div>\n";
+        print "<div class=\"date-field\"><input type=\"hidden\" name=\"show_total\" value=\"0\"/><label><input type=\"checkbox\" name=\"show_total\" value=\"1\"".($show_total === '1' ? ' checked="checked"' : '')."/> Total</label></div>\n";
+        print "<button type=\"submit\">Aplicar gráfico</button>\n";
+        print "</form>\n";
+
         if ($graph_format == 'svg') {
-	     print "<object type=\"image/svg+xml\" width=\"692\" height=\"297\" data=\"graph_svg.php?$graph_params\"></object>\n";
+	     print "<object type=\"image/svg+xml\" width=\"692\" height=\"370\" data=\"graph_svg.php?$graph_params\"></object>\n";
         } else {
 	     print "<img src=\"graph.php?$graph_params\" alt=\"graph\"/>\n";
         }
+    }
 
     if ($page == 's')
     {

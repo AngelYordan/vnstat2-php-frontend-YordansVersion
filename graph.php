@@ -50,12 +50,12 @@
         if ($graph == 'small')
         {
             $iw = 300 + $xrm + $xlm;
-            $ih = 100 + $ytm + $ybm;
+            $ih = 140 + $ytm + $ybm;
         }
         else
         {
             $iw = 600 + $xrm + $xlm;
-            $ih = 200 + $ytm + $ybm;
+            $ih = 260 + $ytm + $ybm;
         }
 
         $im = imagecreatetruecolor($iw,$ih);
@@ -131,6 +131,7 @@
     function draw_data($data)
     {
         global $im,$cl,$iw,$ih,$xlm,$xrm,$ytm,$ybm;
+        global $show_rx, $show_tx, $show_total;
 
         sort($data);
 
@@ -150,15 +151,11 @@
         $high = 0;
         for ($i=0; $i<$x_ticks; $i++)
         {
-            if ($data[$i]['rx'] < $low)
-            $low = $data[$i]['rx'];
-            if ($data[$i]['tx'] < $low)
-            $low = $data[$i]['tx'];
-            if ($data[$i]['rx'] > $high)
+            if ($show_rx === '1' && $data[$i]['rx'] > $high)
             $high = $data[$i]['rx'];
-            if ($data[$i]['tx'] > $high)
+            if ($show_tx === '1' && $data[$i]['tx'] > $high)
             $high = $data[$i]['tx'];
-            if (($data[$i]['rx'] + $data[$i]['tx']) > $high)
+            if ($show_total === '1' && ($data[$i]['rx'] + $data[$i]['tx']) > $high)
             $high = ($data[$i]['rx'] + $data[$i]['tx']);
         }
 
@@ -202,26 +199,40 @@
             for ($i=0; $i<$x_ticks; $i++)
             {
         	$x = (int)($xlm + ($i * $x_step) + ($x_step / 2));
-        	$rx_points[] = array($x, (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['rx'] - $offset) / $sf)));
-        	$tx_points[] = array($x, (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['tx'] - $offset) / $sf)));
-        	$total = $data[$i]['rx'] + $data[$i]['tx'];
-        	$total_points[] = array($x, (int)($ytm + ($ih - $ytm - $ybm) - (($total - $offset) / $sf)));
+        	if ($show_rx === '1') {
+		    $rx_points[] = array($x, (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['rx'] - $offset) / $sf)));
+		}
+        	if ($show_tx === '1') {
+		    $tx_points[] = array($x, (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['tx'] - $offset) / $sf)));
+		}
+        	if ($show_total === '1') {
+		    $total = $data[$i]['rx'] + $data[$i]['tx'];
+		    $total_points[] = array($x, (int)($ytm + ($ih - $ytm - $ybm) - (($total - $offset) / $sf)));
+		}
             }
 
 	    imagesetthickness($im, 2);
 	    for ($i = 1; $i < count($rx_points); $i++) {
 		imageline($im, $rx_points[$i - 1][0], $rx_points[$i - 1][1], $rx_points[$i][0], $rx_points[$i][1], $cl['rx']);
+	    }
+	    for ($i = 1; $i < count($tx_points); $i++) {
 		imageline($im, $tx_points[$i - 1][0], $tx_points[$i - 1][1], $tx_points[$i][0], $tx_points[$i][1], $cl['tx']);
+	    }
+	    for ($i = 1; $i < count($total_points); $i++) {
 		imageline($im, $total_points[$i - 1][0], $total_points[$i - 1][1], $total_points[$i][0], $total_points[$i][1], $cl['total']);
 	    }
 
 	    imagesetthickness($im, 1);
 	    for ($i = 0; $i < count($rx_points); $i++) {
-		imagefilledellipse($im, $rx_points[$i][0], $rx_points[$i][1], 7, 7, $cl['rx']);
+		imagefilledellipse($im, $rx_points[$i][0], $rx_points[$i][1], 7, 7, $cl['image_background']);
 		imageellipse($im, $rx_points[$i][0], $rx_points[$i][1], 7, 7, $cl['rx_border']);
-		imagefilledellipse($im, $tx_points[$i][0], $tx_points[$i][1], 7, 7, $cl['tx']);
+	    }
+	    for ($i = 0; $i < count($tx_points); $i++) {
+		imagefilledellipse($im, $tx_points[$i][0], $tx_points[$i][1], 7, 7, $cl['image_background']);
 		imageellipse($im, $tx_points[$i][0], $tx_points[$i][1], 7, 7, $cl['tx_border']);
-		imagefilledellipse($im, $total_points[$i][0], $total_points[$i][1], 7, 7, $cl['total']);
+	    }
+	    for ($i = 0; $i < count($total_points); $i++) {
+		imagefilledellipse($im, $total_points[$i][0], $total_points[$i][1], 7, 7, $cl['image_background']);
 		imageellipse($im, $total_points[$i][0], $total_points[$i][1], 7, 7, $cl['total_border']);
 	    }
 
@@ -251,17 +262,26 @@
         //
         // legend
         //
-        imagefilledrectangle($im, $xlm, $ih-$ybm+39, $xlm+8,$ih-$ybm+47,$cl['rx']);
-        imagerectangle($im, $xlm, $ih-$ybm+39, $xlm+8,$ih-$ybm+47,$cl['text']);
-	imagettftext($im, 8,0, $xlm+14, $ih-$ybm+48,$cl['text'], GRAPH_FONT,T('bytes in'));
+        $legend_x = $xlm;
+        if ($show_rx === '1') {
+            imagefilledrectangle($im, $legend_x, $ih-$ybm+39, $legend_x+8,$ih-$ybm+47,$cl['rx']);
+            imagerectangle($im, $legend_x, $ih-$ybm+39, $legend_x+8,$ih-$ybm+47,$cl['text']);
+	    imagettftext($im, 8,0, $legend_x+14, $ih-$ybm+48,$cl['text'], GRAPH_FONT,ucfirst(T('bytes in')));
+            $legend_x += 120;
+        }
 
-        imagefilledrectangle($im, $xlm+120 , $ih-$ybm+39, $xlm+128,$ih-$ybm+47,$cl['tx']);
-        imagerectangle($im, $xlm+120, $ih-$ybm+39, $xlm+128,$ih-$ybm+47,$cl['text']);
-	imagettftext($im, 8,0, $xlm+134, $ih-$ybm+48,$cl['text'], GRAPH_FONT,T('bytes out'));
+        if ($show_tx === '1') {
+            imagefilledrectangle($im, $legend_x, $ih-$ybm+39, $legend_x+8,$ih-$ybm+47,$cl['tx']);
+            imagerectangle($im, $legend_x, $ih-$ybm+39, $legend_x+8,$ih-$ybm+47,$cl['text']);
+	    imagettftext($im, 8,0, $legend_x+14, $ih-$ybm+48,$cl['text'], GRAPH_FONT,ucfirst(T('bytes out')));
+            $legend_x += 120;
+        }
 
-        imagefilledrectangle($im, $xlm+240 , $ih-$ybm+39, $xlm+248,$ih-$ybm+47,$cl['total']);
-        imagerectangle($im, $xlm+240, $ih-$ybm+39, $xlm+248,$ih-$ybm+47,$cl['text']);
-	imagettftext($im, 8,0, $xlm+254, $ih-$ybm+48,$cl['text'], GRAPH_FONT,T('Total'));
+        if ($show_total === '1') {
+            imagefilledrectangle($im, $legend_x, $ih-$ybm+39, $legend_x+8,$ih-$ybm+47,$cl['total']);
+            imagerectangle($im, $legend_x, $ih-$ybm+39, $legend_x+8,$ih-$ybm+47,$cl['text']);
+	    imagettftext($im, 8,0, $legend_x+14, $ih-$ybm+48,$cl['text'], GRAPH_FONT,T('Total'));
+        }
     }
 
     function output_image()

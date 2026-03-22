@@ -43,6 +43,7 @@
     $page_list  = array('s','h','d','m','q');
 
     $graph_list = array('large','small','none');
+    $graph_visibility_list = array('0', '1');
 
     $page_title['s'] = T('summary');
     $page_title['h'] = T('hours');
@@ -156,6 +157,7 @@
         global $page,  $page_list;
         global $iface, $iface_list;
         global $graph, $graph_list;
+        global $show_rx, $show_tx, $show_total, $graph_visibility_list;
         global $colorscheme, $style;
         //
         // get interface data
@@ -163,6 +165,9 @@
         $page = isset($_GET['page']) ? $_GET['page'] : '';
         $iface = isset($_GET['if']) ? $_GET['if'] : '';
         $graph = isset($_GET['graph']) ? $_GET['graph'] : '';
+        $show_rx = isset($_GET['show_rx']) ? $_GET['show_rx'] : '1';
+        $show_tx = isset($_GET['show_tx']) ? $_GET['show_tx'] : '1';
+        $show_total = isset($_GET['show_total']) ? $_GET['show_total'] : '0';
         $style = isset($_GET['style']) ? $_GET['style'] : '';
 
         if (!in_array($page, $page_list))
@@ -178,6 +183,19 @@
         if (!in_array($graph, $graph_list))
         {
             $graph = $graph_list[0];
+        }
+
+        if (!in_array((string)$show_rx, $graph_visibility_list, true))
+        {
+            $show_rx = '1';
+        }
+        if (!in_array((string)$show_tx, $graph_visibility_list, true))
+        {
+            $show_tx = '1';
+        }
+        if (!in_array((string)$show_total, $graph_visibility_list, true))
+        {
+            $show_total = '0';
         }
 
         $tp = "./themes/$style";

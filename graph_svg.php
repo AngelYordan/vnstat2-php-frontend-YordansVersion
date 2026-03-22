@@ -127,12 +127,12 @@
         if ($graph == 'small')
         {
             $iw = 300 + $xrm + $xlm;
-            $ih = 100 + $ytm + $ybm;
+            $ih = 140 + $ytm + $ybm;
         }
         else
         {
             $iw = 600 + $xrm + $xlm;
-            $ih = 200 + $ytm + $ybm;
+            $ih = 260 + $ytm + $ybm;
         }
 
 	svg_create($iw, $ih);
@@ -196,6 +196,7 @@
     function draw_data($data)
     {
         global $cl,$iw,$ih,$xlm,$xrm,$ytm,$ybm;
+        global $show_rx, $show_tx, $show_total;
 
         sort($data);
 
@@ -215,15 +216,11 @@
         $high = 0;
         for ($i=0; $i<$x_ticks; $i++)
         {
-            if ($data[$i]['rx'] < $low)
-            $low = $data[$i]['rx'];
-            if ($data[$i]['tx'] < $low)
-            $low = $data[$i]['tx'];
-            if ($data[$i]['rx'] > $high)
+            if ($show_rx === '1' && $data[$i]['rx'] > $high)
             $high = $data[$i]['rx'];
-            if ($data[$i]['tx'] > $high)
+            if ($show_tx === '1' && $data[$i]['tx'] > $high)
             $high = $data[$i]['tx'];
-            if (($data[$i]['rx'] + $data[$i]['tx']) > $high)
+            if ($show_total === '1' && ($data[$i]['rx'] + $data[$i]['tx']) > $high)
             $high = ($data[$i]['rx'] + $data[$i]['tx']);
         }
 
@@ -264,41 +261,56 @@
             for ($i=0; $i<$x_ticks; $i++)
             {
         	$x = (int)($xlm + ($i * $x_step) + ($x_step / 2));
-        	$rx_y = (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['rx'] - $offset) / $sf));
-        	$tx_y = (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['tx'] - $offset) / $sf));
-        	$total = $data[$i]['rx'] + $data[$i]['tx'];
-        	$total_y = (int)($ytm + ($ih - $ytm - $ybm) - (($total - $offset) / $sf));
-
-        	$rx_points[] = $x;
-        	$rx_points[] = $rx_y;
-        	$tx_points[] = $x;
-        	$tx_points[] = $tx_y;
-        	$total_points[] = $x;
-        	$total_points[] = $total_y;
+        	if ($show_rx === '1') {
+		    $rx_y = (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['rx'] - $offset) / $sf));
+		    $rx_points[] = $x;
+		    $rx_points[] = $rx_y;
+		}
+        	if ($show_tx === '1') {
+		    $tx_y = (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['tx'] - $offset) / $sf));
+		    $tx_points[] = $x;
+		    $tx_points[] = $tx_y;
+		}
+        	if ($show_total === '1') {
+		    $total = $data[$i]['rx'] + $data[$i]['tx'];
+		    $total_y = (int)($ytm + ($ih - $ytm - $ybm) - (($total - $offset) / $sf));
+		    $total_points[] = $x;
+		    $total_points[] = $total_y;
+		}
             }
 
+	    if (count($rx_points) > 1) {
 	    svg_polyline($rx_points, array(
 		'stroke' => $cl['rx']['rgb'], 'stroke-opacity' => '1.0', 'stroke-width' => '2',
 		'fill' => 'none', 'stroke-linejoin' => 'round', 'stroke-linecap' => 'round'
 	    ));
+	    }
+	    if (count($tx_points) > 1) {
 	    svg_polyline($tx_points, array(
 		'stroke' => $cl['tx']['rgb'], 'stroke-opacity' => '1.0', 'stroke-width' => '2',
 		'fill' => 'none', 'stroke-linejoin' => 'round', 'stroke-linecap' => 'round'
 	    ));
+	    }
+	    if (count($total_points) > 1) {
 	    svg_polyline($total_points, array(
 		'stroke' => $cl['total']['rgb'], 'stroke-opacity' => '1.0', 'stroke-width' => '2',
 		'fill' => 'none', 'stroke-linejoin' => 'round', 'stroke-linecap' => 'round'
 	    ));
+	    }
 
 	    for ($i = 0; $i < count($rx_points); $i += 2) {
 		svg_rect($rx_points[$i] - 3, $rx_points[$i + 1] - 3, 6, 6, array(
-		    'stroke' => $cl['rx_border']['rgb'], 'stroke-width' => 1, 'fill' => $cl['rx']['rgb'], 'rx' => '3', 'ry' => '3'
+		    'stroke' => $cl['rx_border']['rgb'], 'stroke-width' => 2, 'fill' => '#FFFFFF', 'rx' => '3', 'ry' => '3'
 		));
+	    }
+	    for ($i = 0; $i < count($tx_points); $i += 2) {
 		svg_rect($tx_points[$i] - 3, $tx_points[$i + 1] - 3, 6, 6, array(
-		    'stroke' => $cl['tx_border']['rgb'], 'stroke-width' => 1, 'fill' => $cl['tx']['rgb'], 'rx' => '3', 'ry' => '3'
+		    'stroke' => $cl['tx_border']['rgb'], 'stroke-width' => 2, 'fill' => '#FFFFFF', 'rx' => '3', 'ry' => '3'
 		));
+	    }
+	    for ($i = 0; $i < count($total_points); $i += 2) {
 		svg_rect($total_points[$i] - 3, $total_points[$i + 1] - 3, 6, 6, array(
-		    'stroke' => $cl['total_border']['rgb'], 'stroke-width' => 1, 'fill' => $cl['total']['rgb'], 'rx' => '3', 'ry' => '3'
+		    'stroke' => $cl['total_border']['rgb'], 'stroke-width' => 2, 'fill' => '#FFFFFF', 'rx' => '3', 'ry' => '3'
 		));
 	    }
 
@@ -327,14 +339,23 @@
         //
         // legend
         //
-        svg_rect($xlm, $ih-$ybm+39, 10, 10, array( 'stroke' => 'none', 'fill' => $cl['rx']['rgb'], 'rx' => '2', 'ry' => '2') );
-	svg_text($xlm+16, $ih-$ybm+48, T('bytes in'), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
+        $legend_x = $xlm;
+        if ($show_rx === '1') {
+            svg_rect($legend_x, $ih-$ybm+39, 10, 10, array( 'stroke' => 'none', 'fill' => $cl['rx']['rgb'], 'rx' => '2', 'ry' => '2') );
+	    svg_text($legend_x+16, $ih-$ybm+48, ucfirst(T('bytes in')), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
+            $legend_x += 120;
+        }
 
-        svg_rect($xlm+120 , $ih-$ybm+39, 10, 10, array( 'stroke' => 'none', 'fill' => $cl['tx']['rgb'], 'rx' => '2', 'ry' => '2') );
-	svg_text($xlm+136, $ih-$ybm+48, T('bytes out'), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
+        if ($show_tx === '1') {
+            svg_rect($legend_x , $ih-$ybm+39, 10, 10, array( 'stroke' => 'none', 'fill' => $cl['tx']['rgb'], 'rx' => '2', 'ry' => '2') );
+	    svg_text($legend_x+16, $ih-$ybm+48, ucfirst(T('bytes out')), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
+            $legend_x += 120;
+        }
 
-        svg_rect($xlm+240 , $ih-$ybm+39, 10, 10, array( 'stroke' => 'none', 'fill' => $cl['total']['rgb'], 'rx' => '2', 'ry' => '2') );
-	svg_text($xlm+256, $ih-$ybm+48, T('Total'), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
+        if ($show_total === '1') {
+            svg_rect($legend_x , $ih-$ybm+39, 10, 10, array( 'stroke' => 'none', 'fill' => $cl['total']['rgb'], 'rx' => '2', 'ry' => '2') );
+	    svg_text($legend_x+16, $ih-$ybm+48, T('Total'), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
+        }
     }
 
     function output_image()
