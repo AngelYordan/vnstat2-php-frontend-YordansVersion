@@ -75,6 +75,8 @@
         $cl['rx_border'] = allocate_color($im, $cs['rx_border']);
         $cl['tx'] = allocate_color($im, $cs['tx']);
         $cl['tx_border'] = allocate_color($im, $cs['tx_border']);
+        $cl['total'] = imagecolorallocatealpha($im, 30, 136, 229, 0);
+        $cl['total_border'] = imagecolorallocatealpha($im, 13, 71, 161, 0);
 
         imagefilledrectangle($im,0,0,$iw,$ih,$cl['image_background']);
 	imagefilledrectangle($im,$xlm,$ytm,$iw-$xrm,$ih-$ybm, $cl['background']);
@@ -141,8 +143,6 @@
         $gr_h = $ih - $ytm - $ybm;
         $x_step = ($iw - $xlm - $xrm) / ($x_ticks ?: 1);
         $y_step = ($ih - $ytm - $ybm) / $y_ticks;
-        $bar_w = ($x_step / 2) ;
-
         //
         // determine scale
         //
@@ -158,6 +158,8 @@
             $high = $data[$i]['rx'];
             if ($data[$i]['tx'] > $high)
             $high = $data[$i]['tx'];
+            if (($data[$i]['rx'] + $data[$i]['tx']) > $high)
+            $high = ($data[$i]['rx'] + $data[$i]['tx']);
         }
 
         while ($high > ($prescale * $y_scale * $y_ticks))
@@ -193,48 +195,35 @@
         }
         else
         {
-            //
-            // draw bars
-            //
+            $rx_points = array();
+            $tx_points = array();
+            $total_points = array();
+
             for ($i=0; $i<$x_ticks; $i++)
             {
-        	$x = $xlm + ($i * $x_step);
-        	$y = $ytm + ($ih - $ytm - $ybm) - (($data[$i]['rx'] - $offset) / $sf);
-
-		$depth = $x_step / 8;
-		$space = 0;
-
-		$x1 = $x;
-		$y1 = $y;
-		$x2 = $x + $bar_w - $space;
-		$y2 = $ih - $ybm;
-
-        	imagefilledrectangle($im, $x1, $y1, $x2, $y2, $cl['rx']);
-		imagerectangle($im, $x1, $y1, $x2, $y2, $cl['rx_border']);
-
-		imagefilledrectangle($im, $x1 - $depth, $y1 + $depth, $x2 -$depth, $y2 + $depth, $cl['rx']);
-		imagerectangle($im, $x1 - $depth, $y1 + $depth, $x2 - $depth, $y2 + $depth, $cl['rx_border']);
-
-		imagefilledpolygon($im, array($x1, $y1, $x2, $y1, $x2 - $depth, $y1 + $depth, $x1 - $depth, $y1 + $depth), 4, $cl['rx']);
-		imagepolygon($im, array($x1, $y1, $x2, $y1, $x2 - $depth, $y1 + $depth, $x1 - $depth, $y1 + $depth), 4, $cl['rx_border']);
-		imagefilledpolygon($im, array($x2, $y1, $x2, $y2, $x2 - $depth, $y2 + $depth, $x2 - $depth, $y1 + $depth), 4, $cl['rx']);
-		imagepolygon($im, array($x2, $y1, $x2, $y2, $x2 - $depth, $y2 + $depth, $x2 - $depth, $y1 + $depth), 4, $cl['rx_border']);
-
-        	$y1 = $ytm + ($ih - $ytm - $ybm) - (($data[$i]['tx'] - $offset) / $sf);
-		$x1 = $x1 + $bar_w;
-		$x2 = $x2 + $bar_w;
-
-        	imagefilledrectangle($im, $x1, $y1, $x2, $y2, $cl['tx']);
-		imagerectangle($im, $x1, $y1, $x2, $y2, $cl['tx_border']);
-
-        	imagefilledrectangle($im, $x1 - $depth, $y1 + $depth, $x2 - $depth, $y2 + $depth, $cl['tx']);
-		imagerectangle($im, $x1 - $depth, $y1 + $depth, $x2 - $depth, $y2 + $depth, $cl['tx_border']);
-
-		imagefilledpolygon($im, array($x1, $y1, $x2, $y1, $x2 - $depth, $y1 + $depth, $x1 - $depth, $y1 + $depth), 4, $cl['tx']);
-		imagepolygon($im, array($x1, $y1, $x2, $y1, $x2 - $depth, $y1 + $depth, $x1 - $depth, $y1 + $depth), 4, $cl['tx_border']);
-		imagefilledpolygon($im, array($x2, $y1, $x2, $y2, $x2 - $depth, $y2 + $depth, $x2 - $depth, $y1 + $depth), 4, $cl['tx']);
-		imagepolygon($im, array($x2, $y1, $x2, $y2, $x2 - $depth, $y2 + $depth, $x2 - $depth, $y1 + $depth), 4, $cl['tx_border']);
+        	$x = (int)($xlm + ($i * $x_step) + ($x_step / 2));
+        	$rx_points[] = array($x, (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['rx'] - $offset) / $sf)));
+        	$tx_points[] = array($x, (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['tx'] - $offset) / $sf)));
+        	$total = $data[$i]['rx'] + $data[$i]['tx'];
+        	$total_points[] = array($x, (int)($ytm + ($ih - $ytm - $ybm) - (($total - $offset) / $sf)));
             }
+
+	    imagesetthickness($im, 2);
+	    for ($i = 1; $i < count($rx_points); $i++) {
+		imageline($im, $rx_points[$i - 1][0], $rx_points[$i - 1][1], $rx_points[$i][0], $rx_points[$i][1], $cl['rx']);
+		imageline($im, $tx_points[$i - 1][0], $tx_points[$i - 1][1], $tx_points[$i][0], $tx_points[$i][1], $cl['tx']);
+		imageline($im, $total_points[$i - 1][0], $total_points[$i - 1][1], $total_points[$i][0], $total_points[$i][1], $cl['total']);
+	    }
+
+	    imagesetthickness($im, 1);
+	    for ($i = 0; $i < count($rx_points); $i++) {
+		imagefilledellipse($im, $rx_points[$i][0], $rx_points[$i][1], 7, 7, $cl['rx']);
+		imageellipse($im, $rx_points[$i][0], $rx_points[$i][1], 7, 7, $cl['rx_border']);
+		imagefilledellipse($im, $tx_points[$i][0], $tx_points[$i][1], 7, 7, $cl['tx']);
+		imageellipse($im, $tx_points[$i][0], $tx_points[$i][1], 7, 7, $cl['tx_border']);
+		imagefilledellipse($im, $total_points[$i][0], $total_points[$i][1], 7, 7, $cl['total']);
+		imageellipse($im, $total_points[$i][0], $total_points[$i][1], 7, 7, $cl['total_border']);
+	    }
 
             //
             // axis labels
@@ -244,7 +233,7 @@
                 $label = ($i * $y_scale).$unit;
 		$bbox = imagettfbbox(8, 0, GRAPH_FONT, $label);
 		$textwidth = $bbox[2] - $bbox[0];
-		imagettftext($im, 8, 0, $xlm - $textwidth - 16, ($ih - $ybm) - ($i * $y_step) + 8 + $depth, $cl['text'], GRAPH_FONT, $label);
+		imagettftext($im, 8, 0, $xlm - $textwidth - 16, ($ih - $ybm) - ($i * $y_step) + 8, $cl['text'], GRAPH_FONT, $label);
             }
 
             for ($i=0; $i<$x_ticks; $i++)
@@ -252,7 +241,7 @@
                 $label = $data[$i]['img_label'];
 		$bbox = imagettfbbox(9, 0, GRAPH_FONT, $label);
 		$textwidth = $bbox[2] - $bbox[0];
-		imagettftext($im, 9, 0, $xlm + ($i * $x_step) + ($x_step / 2) - ($textwidth / 2) - $depth - 4, $ih - $ybm + 20 + $depth, $cl['text'], GRAPH_FONT, $label);
+		imagettftext($im, 9, 0, $xlm + ($i * $x_step) + ($x_step / 2) - ($textwidth / 2), $ih - $ybm + 20, $cl['text'], GRAPH_FONT, $label);
             }
         }
 
@@ -269,6 +258,10 @@
         imagefilledrectangle($im, $xlm+120 , $ih-$ybm+39, $xlm+128,$ih-$ybm+47,$cl['tx']);
         imagerectangle($im, $xlm+120, $ih-$ybm+39, $xlm+128,$ih-$ybm+47,$cl['text']);
 	imagettftext($im, 8,0, $xlm+134, $ih-$ybm+48,$cl['text'], GRAPH_FONT,T('bytes out'));
+
+        imagefilledrectangle($im, $xlm+240 , $ih-$ybm+39, $xlm+248,$ih-$ybm+47,$cl['total']);
+        imagerectangle($im, $xlm+240, $ih-$ybm+39, $xlm+248,$ih-$ybm+47,$cl['text']);
+	imagettftext($im, 8,0, $xlm+254, $ih-$ybm+48,$cl['text'], GRAPH_FONT,T('Total'));
     }
 
     function output_image()

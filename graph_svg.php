@@ -92,6 +92,17 @@
        print "\"/>\n";
     }
 
+    function svg_polyline($points, $options = array())
+    {
+       print "<polyline points=\"";
+       for ($p = 0; $p < count($points); $p += 2) {
+	  printf("%F,%F ", $points[$p], $points[$p+1]);
+       }
+       print "\" ";
+       svg_options($options);
+       print "/>\n";
+    }
+
     function allocate_color($colors)
     {
 	$col['rgb'] = sprintf("#%02X%02X%02X", $colors[0], $colors[1], $colors[2]);
@@ -141,6 +152,8 @@
 	$cl['rx_border'] = array('rgb' => '#C62828', 'opacity' => '1.0');
 	$cl['tx'] = array('rgb' => '#2E7D32', 'opacity' => '0.90');
 	$cl['tx_border'] = array('rgb' => '#1B5E20', 'opacity' => '1.0');
+	$cl['total'] = array('rgb' => '#1E88E5', 'opacity' => '0.90');
+	$cl['total_border'] = array('rgb' => '#0D47A1', 'opacity' => '1.0');
 
 	svg_rect(0, 0, $iw, $ih, array( 'stroke' => 'none', 'stroke-width' => 0, 'fill' => $cl['image_background']['rgb']) );
 	svg_rect($xlm, $ytm, $iw-$xrm-$xlm, $ih-$ybm-$ytm, array( 'stroke' => 'none', 'stroke-width' => 0, 'fill' => $cl['background']['rgb']) );
@@ -195,8 +208,6 @@
         $gr_h = $ih - $ytm - $ybm;
         $x_step = ($iw - $xlm - $xrm) / ($x_ticks ?: 1);
         $y_step = ($ih - $ytm - $ybm) / $y_ticks;
-        $bar_w = ($x_step / 2);
-
         //
         // determine scale
         //
@@ -212,6 +223,8 @@
             $high = $data[$i]['rx'];
             if ($data[$i]['tx'] > $high)
             $high = $data[$i]['tx'];
+            if (($data[$i]['rx'] + $data[$i]['tx']) > $high)
+            $high = ($data[$i]['rx'] + $data[$i]['tx']);
         }
 
         while ($high > ($prescale * $y_scale * $y_ticks))
@@ -244,38 +257,50 @@
         }
         else
         {
-            //
-            // draw bars
-            //
+            $rx_points = array();
+            $tx_points = array();
+            $total_points = array();
+
             for ($i=0; $i<$x_ticks; $i++)
             {
-        	$x = $xlm + ($i * $x_step);
-        	$y = $ytm + ($ih - $ytm - $ybm) - (($data[$i]['rx'] - $offset) / $sf);
+        	$x = (int)($xlm + ($i * $x_step) + ($x_step / 2));
+        	$rx_y = (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['rx'] - $offset) / $sf));
+        	$tx_y = (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['tx'] - $offset) / $sf));
+        	$total = $data[$i]['rx'] + $data[$i]['tx'];
+        	$total_y = (int)($ytm + ($ih - $ytm - $ybm) - (($total - $offset) / $sf));
 
-		$space = ($x_ticks > 16) ? 1 : 2;
-
-		$x1 = (int)$x;
-		$y1 = (int)$y;
-		$w = (int)($bar_w - $space);
-		$h = (int)($ih - $ybm - $y);
-
-		svg_group( array( 'stroke' => $cl['rx_border']['rgb'], 'stroke-opacity' => '0.85', 
-				  'stroke-width' => 1, 'stroke-linejoin' => 'round',
-			          'fill' => $cl['rx']['rgb'], 'fill-opacity' => $cl['rx']['opacity'] ) );
-	        svg_rect($x1, $y1, $w, $h, array('rx' => '3', 'ry' => '3'));
-		svg_group_end();
-
-	        $y1 = (int)($ytm + ($ih - $ytm - $ybm) - (($data[$i]['tx'] - $offset) / $sf));
-		$x1 = (int)($x1 + $bar_w);
-		$w = (int)($bar_w - $space);
-		$h = (int)($ih - $ybm - $y1 - 1);
-
-		svg_group( array( 'stroke' => $cl['tx_border']['rgb'], 'stroke-opacity' => '0.85',
-				  'stroke-width' => 1, 'stroke-linejoin' => 'round',
-			          'fill' => $cl['tx']['rgb'], 'fill-opacity' => $cl['tx']['opacity'] ) );
-	        svg_rect($x1, $y1, $w, $h, array('rx' => '3', 'ry' => '3'));
-		svg_group_end();
+        	$rx_points[] = $x;
+        	$rx_points[] = $rx_y;
+        	$tx_points[] = $x;
+        	$tx_points[] = $tx_y;
+        	$total_points[] = $x;
+        	$total_points[] = $total_y;
             }
+
+	    svg_polyline($rx_points, array(
+		'stroke' => $cl['rx']['rgb'], 'stroke-opacity' => '1.0', 'stroke-width' => '2',
+		'fill' => 'none', 'stroke-linejoin' => 'round', 'stroke-linecap' => 'round'
+	    ));
+	    svg_polyline($tx_points, array(
+		'stroke' => $cl['tx']['rgb'], 'stroke-opacity' => '1.0', 'stroke-width' => '2',
+		'fill' => 'none', 'stroke-linejoin' => 'round', 'stroke-linecap' => 'round'
+	    ));
+	    svg_polyline($total_points, array(
+		'stroke' => $cl['total']['rgb'], 'stroke-opacity' => '1.0', 'stroke-width' => '2',
+		'fill' => 'none', 'stroke-linejoin' => 'round', 'stroke-linecap' => 'round'
+	    ));
+
+	    for ($i = 0; $i < count($rx_points); $i += 2) {
+		svg_rect($rx_points[$i] - 3, $rx_points[$i + 1] - 3, 6, 6, array(
+		    'stroke' => $cl['rx_border']['rgb'], 'stroke-width' => 1, 'fill' => $cl['rx']['rgb'], 'rx' => '3', 'ry' => '3'
+		));
+		svg_rect($tx_points[$i] - 3, $tx_points[$i + 1] - 3, 6, 6, array(
+		    'stroke' => $cl['tx_border']['rgb'], 'stroke-width' => 1, 'fill' => $cl['tx']['rgb'], 'rx' => '3', 'ry' => '3'
+		));
+		svg_rect($total_points[$i] - 3, $total_points[$i + 1] - 3, 6, 6, array(
+		    'stroke' => $cl['total_border']['rgb'], 'stroke-width' => 1, 'fill' => $cl['total']['rgb'], 'rx' => '3', 'ry' => '3'
+		));
+	    }
 
             //
             // axis labels
@@ -307,6 +332,9 @@
 
         svg_rect($xlm+120 , $ih-$ybm+39, 10, 10, array( 'stroke' => 'none', 'fill' => $cl['tx']['rgb'], 'rx' => '2', 'ry' => '2') );
 	svg_text($xlm+136, $ih-$ybm+48, T('bytes out'), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
+
+        svg_rect($xlm+240 , $ih-$ybm+39, 10, 10, array( 'stroke' => 'none', 'fill' => $cl['total']['rgb'], 'rx' => '2', 'ry' => '2') );
+	svg_text($xlm+256, $ih-$ybm+48, T('Total'), array( 'fill' => $cl['text']['rgb'], 'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-size' => '8pt') );
     }
 
     function output_image()
