@@ -198,7 +198,7 @@ a[href]:focus {
 #main td.numeric_even {
     text-align: right;
     color: #111827;
-    background-color: #f9fafb;
+    background-color: #fff7e7;
 }
 
 #main td.label_odd,
@@ -217,14 +217,6 @@ a[href]:focus {
     border-bottom: 1px solid #d1d5db;
 }
 
-
-#main th.gb_col {
-    background-color: #fdf1d9;
-}
-
-#main td.gb_col {
-    background-color: #fff7e7;
-}
 
 #main caption {
     font-size: 1.08em;

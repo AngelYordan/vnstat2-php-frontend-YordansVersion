@@ -42,23 +42,23 @@
             if ($iface == $if) {
                 print "<li class=\"iface active\">";
             } else {
-                print "<li class=\"iface\">";
+            print "<li class=\"iface\">";
             }
             print "<a href=\"$script?if=$if$p\">";
             if (isset($iface_title[$if]))
             {
-                print $iface_title[$if];
+                print ucfirst($iface_title[$if]);
             }
             else
             {
-                print $if;
+                print ucfirst($if);
             }
             print "</a>";
             print "<ul class=\"page\">\n";
             foreach ($page_list as $pg)
             {
                 $page_class = ($iface == $if && $page == $pg) ? 'page active' : 'page';
-                print "<li class=\"$page_class\"><a href=\"$script?if=$if$p&amp;page=$pg\">".$page_title[$pg]."</a></li>\n";
+                print "<li class=\"$page_class\"><a href=\"$script?if=$if$p&amp;page=$pg\">".ucfirst($page_title[$pg])."</a></li>\n";
             }
             print "</ul></li>\n";
         }
