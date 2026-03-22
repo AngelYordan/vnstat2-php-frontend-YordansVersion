@@ -188,7 +188,7 @@ a[href]:focus {
 #main td.numeric_even {
     text-align: right;
     color: #111827;
-    background-color: #f9fafb;
+    background-color: #fff7e7;
 }
 
 #main td.label_odd,
@@ -207,14 +207,6 @@ a[href]:focus {
     border-bottom: 1px solid #d1d5db;
 }
 
-
-#main th.gb_col {
-    background-color: #fdf1d9;
-}
-
-#main td.gb_col {
-    background-color: #fff7e7;
-}
 
 #main caption {
     font-size: 1.08em;
@@ -307,4 +299,114 @@ a[href]:focus {
 .date-range-message.error {
     color: #b91c1c;
     font-weight: 700;
+}
+
+
+.query-layout {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+}
+
+.query-controls {
+    width: 260px;
+    flex: 0 0 260px;
+}
+
+#query-form {
+    margin: 0 0 14px;
+    padding: 12px;
+    border: 1px solid #dbe3f0;
+    border-radius: 10px;
+    background: #f8fbff;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#query-form .date-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#query-form label {
+    font-size: 0.82em;
+    font-weight: 700;
+    color: #334155;
+}
+
+#query-form input[type="date"],
+#query-form select {
+    border: 1px solid #94a3b8;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 0.9em;
+    color: #0f172a;
+    background: #ffffff;
+}
+
+#query-form button {
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#query-form button:hover {
+    background: #1d4ed8;
+}
+
+.query-meta {
+    margin-bottom: 10px;
+    font-size: 0.95em;
+    color: #334155;
+}
+
+.query-export {
+    color: #c2410c;
+    font-weight: 700;
+}
+
+.query-results {
+    flex: 1;
+    min-width: 0;
+}
+
+.query-pagination {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 0.9em;
+}
+
+.query-pagination a {
+    font-weight: 700;
+}
+
+.query-sort-link {
+    color: inherit;
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+}
+
+.query-sort-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 960px) {
+    .query-layout {
+        flex-direction: column;
+    }
+
+    .query-controls {
+        width: 100%;
+        flex: none;
+    }
 }

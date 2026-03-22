@@ -40,7 +40,7 @@
         die('can\'t determine script name!');
     }
 
-    $page_list  = array('s','h','d','m');
+    $page_list  = array('s','h','d','m','q');
 
     $graph_list = array('large','small','none');
 
@@ -48,6 +48,7 @@
     $page_title['h'] = T('hours');
     $page_title['d'] = T('days');
     $page_title['m'] = T('months');
+    $page_title['q'] = 'Consultas';
 
 
     //
