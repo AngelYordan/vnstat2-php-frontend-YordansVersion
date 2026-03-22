@@ -237,6 +237,151 @@
         return $filtered;
     }
 
+    function get_query_group_label($query_group)
+    {
+        if ($query_group == 'y') {
+            return 'Agrupar por Año';
+        }
+        if ($query_group == 'm') {
+            return 'Agrupar por Mes';
+        }
+        if ($query_group == 'h') {
+            return 'Agrupar por Hora';
+        }
+
+        return 'Agrupar por Día';
+    }
+
+    function build_query_rows($query_group, $day_all, $hour)
+    {
+        $grouped = array();
+        $format = '%d %b %Y';
+        $source = $day_all;
+
+        if ($query_group == 'h') {
+            $source = $hour;
+            $format = '%d %b %Y %H:00';
+        } else if ($query_group == 'm') {
+            $format = '%b %Y';
+        } else if ($query_group == 'y') {
+            $format = '%Y';
+        }
+
+        for ($i = 0; $i < count($source); $i++)
+        {
+            if (!isset($source[$i]['time'])) {
+                continue;
+            }
+
+            $ts = $source[$i]['time'];
+            if ($query_group == 'm') {
+                $bucket = mktime(0, 0, 0, (int)date('n', $ts), 1, (int)date('Y', $ts));
+            } else if ($query_group == 'y') {
+                $bucket = mktime(0, 0, 0, 1, 1, (int)date('Y', $ts));
+            } else if ($query_group == 'h') {
+                $bucket = mktime((int)date('G', $ts), 0, 0, (int)date('n', $ts), (int)date('j', $ts), (int)date('Y', $ts));
+            } else {
+                $bucket = mktime(0, 0, 0, (int)date('n', $ts), (int)date('j', $ts), (int)date('Y', $ts));
+            }
+
+            if (!isset($grouped[$bucket])) {
+                $grouped[$bucket] = array(
+                    'time' => $bucket,
+                    'rx' => 0,
+                    'tx' => 0,
+                    'act' => 1,
+                );
+            }
+
+            $grouped[$bucket]['rx'] += $source[$i]['rx'];
+            $grouped[$bucket]['tx'] += $source[$i]['tx'];
+        }
+
+        krsort($grouped);
+        $rows = array_values($grouped);
+        for ($i = 0; $i < count($rows); $i++)
+        {
+            $rows[$i]['label'] = strftime_compat($format, $rows[$i]['time']);
+        }
+
+        return $rows;
+    }
+
+    function write_query_results($rows, $query_page, $query_group, $query_from_date, $query_to_date)
+    {
+        global $iface, $style, $script;
+
+        $per_page = 20;
+        $total_rows = count($rows);
+        $total_pages = max(1, (int)ceil($total_rows / $per_page));
+        $query_page = max(1, min($query_page, $total_pages));
+        $start = ($query_page - 1) * $per_page;
+        $visible_rows = array_slice($rows, $start, $per_page);
+        $end = $start + count($visible_rows);
+
+        $base_params = "if=".rawurlencode($iface)."&page=q&graph=none&style=".rawurlencode($style)
+            ."&q_group=".rawurlencode($query_group)
+            ."&q_from_date=".rawurlencode($query_from_date)
+            ."&q_to_date=".rawurlencode($query_to_date);
+
+        print "<div class=\"query-layout\">\n";
+        print "<div class=\"query-controls\">\n";
+        print "<form id=\"query-form\" method=\"get\" action=\"$script\">\n";
+        print "<input type=\"hidden\" name=\"if\" value=\"".htmlspecialchars($iface, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<input type=\"hidden\" name=\"page\" value=\"q\"/>\n";
+        print "<input type=\"hidden\" name=\"graph\" value=\"none\"/>\n";
+        print "<input type=\"hidden\" name=\"style\" value=\"".htmlspecialchars($style, ENT_QUOTES, 'UTF-8')."\"/>\n";
+        print "<div class=\"date-field\"><label for=\"q_from_date\">From Date</label><input id=\"q_from_date\" name=\"q_from_date\" type=\"date\" value=\"".htmlspecialchars($query_from_date, ENT_QUOTES, 'UTF-8')."\"/></div>\n";
+        print "<div class=\"date-field\"><label for=\"q_to_date\">To Date</label><input id=\"q_to_date\" name=\"q_to_date\" type=\"date\" value=\"".htmlspecialchars($query_to_date, ENT_QUOTES, 'UTF-8')."\"/></div>\n";
+        print "<div class=\"date-field\"><label for=\"q_group\">Agrupar por</label><select id=\"q_group\" name=\"q_group\">";
+        print "<option value=\"y\"".($query_group == 'y' ? ' selected="selected"' : '').">Años</option>";
+        print "<option value=\"m\"".($query_group == 'm' ? ' selected="selected"' : '').">Meses</option>";
+        print "<option value=\"d\"".($query_group == 'd' ? ' selected="selected"' : '').">Días</option>";
+        print "<option value=\"h\"".($query_group == 'h' ? ' selected="selected"' : '').">Horas</option>";
+        print "</select></div>\n";
+        print "<button type=\"submit\">Go</button>\n";
+        print "</form>\n";
+        print "<div class=\"query-meta\">Search found $total_rows results.</div>\n";
+        print "<a class=\"query-export\" href=\"$script?$base_params&amp;export=1\">Export Results</a>\n";
+        print "</div>\n";
+
+        print "<div class=\"query-results\">\n";
+        print "<table width=\"100%\" cellspacing=\"0\">\n";
+        print "<caption>".get_query_group_label($query_group)."</caption>\n";
+        print "<tr><th class=\"label\">Date</th><th class=\"label\">Download</th><th class=\"label\">Upload</th><th class=\"label\">Combined</th></tr>\n";
+
+        if (count($visible_rows) == 0) {
+            print "<tr><td class=\"label_even\" colspan=\"4\">No hay datos para mostrar.</td></tr>\n";
+        } else {
+            for ($i = 0; $i < count($visible_rows); $i++)
+            {
+                $id = ($i & 1) ? 'odd' : 'even';
+                $rx = kbytes_to_dynamic_string($visible_rows[$i]['rx']);
+                $tx = kbytes_to_dynamic_string($visible_rows[$i]['tx']);
+                $total = kbytes_to_dynamic_string($visible_rows[$i]['rx'] + $visible_rows[$i]['tx']);
+                print "<tr>";
+                print "<td class=\"label_$id\">".$visible_rows[$i]['label']."</td>";
+                print "<td class=\"numeric_$id\">$rx</td>";
+                print "<td class=\"numeric_$id\">$tx</td>";
+                print "<td class=\"numeric_$id\">$total</td>";
+                print "</tr>\n";
+            }
+        }
+        print "</table>\n";
+
+        print "<div class=\"query-pagination\">";
+        print "<span>Displaying ".($total_rows > 0 ? $start + 1 : 0)." to $end of $total_rows items</span>";
+        if ($query_page > 1) {
+            print "<a href=\"$script?$base_params&amp;q_page=".($query_page - 1)."\">&laquo; Anterior</a>";
+        }
+        if ($query_page < $total_pages) {
+            print "<a href=\"$script?$base_params&amp;q_page=".($query_page + 1)."\">Siguiente &raquo;</a>";
+        }
+        print "</div>\n";
+        print "</div>\n";
+        print "</div>\n";
+    }
+
     get_vnstat_data();
 
     $from_date = isset($_GET['from_date']) ? $_GET['from_date'] : '';
@@ -255,6 +400,57 @@
             $custom_day_error = 'La fecha inicial no puede ser mayor que la final.';
         } else {
             $custom_day_range = filter_days_between($day_all, $from_ts, $to_ts);
+        }
+    }
+
+    $query_from_date = isset($_GET['q_from_date']) ? $_GET['q_from_date'] : '';
+    $query_to_date = isset($_GET['q_to_date']) ? $_GET['q_to_date'] : '';
+    $query_group = isset($_GET['q_group']) ? $_GET['q_group'] : 'd';
+    $query_page = isset($_GET['q_page']) ? (int)$_GET['q_page'] : 1;
+    $query_rows = array();
+
+    if (!in_array($query_group, array('y', 'm', 'd', 'h'))) {
+        $query_group = 'd';
+    }
+
+    if ($page == 'q')
+    {
+        $source_days = $day_all;
+        if ($query_group == 'h') {
+            $source_days = $hour;
+        }
+
+        if ($query_from_date !== '' || $query_to_date !== '')
+        {
+            $query_from_ts = parse_iso_date($query_from_date);
+            $query_to_ts = parse_iso_date($query_to_date);
+
+            if ($query_from_ts !== false && $query_to_ts !== false && $query_from_ts <= $query_to_ts) {
+                $source_days = filter_days_between($source_days, $query_from_ts, $query_to_ts + 86399);
+            } else {
+                $source_days = array();
+            }
+        }
+
+        if ($query_group == 'h') {
+            $query_rows = build_query_rows('h', array(), $source_days);
+        } else {
+            $query_rows = build_query_rows($query_group, $source_days, array());
+        }
+
+        if (isset($_GET['export']) && $_GET['export'] == '1')
+        {
+            header('Content-type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename="consultas.csv"');
+            print "Date,Download,Upload,Combined\n";
+            for ($i = 0; $i < count($query_rows); $i++)
+            {
+                $rx = kbytes_to_dynamic_string($query_rows[$i]['rx']);
+                $tx = kbytes_to_dynamic_string($query_rows[$i]['tx']);
+                $total = kbytes_to_dynamic_string($query_rows[$i]['rx'] + $query_rows[$i]['tx']);
+                print "\"".$query_rows[$i]['label']."\",\"$rx\",\"$tx\",\"$total\"\n";
+            }
+            exit;
         }
     }
 
@@ -304,7 +500,7 @@
     }
 
     $graph_params = "if=$iface&amp;page=$page&amp;style=$style";
-    if ($page != 's')
+    if ($page == 'h' || $page == 'd' || $page == 'm')
         if ($graph_format == 'svg') {
 	     print "<object type=\"image/svg+xml\" width=\"692\" height=\"297\" data=\"graph_svg.php?$graph_params\"></object>\n";
         } else {
@@ -331,6 +527,10 @@
     else if ($page == 'm')
     {
         write_data_table(T('Last 12 months'), $month);
+    }
+    else if ($page == 'q')
+    {
+        write_query_results($query_rows, $query_page, $query_group, $query_from_date, $query_to_date);
     }
     ?>
     </div>
