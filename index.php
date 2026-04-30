@@ -509,183 +509,65 @@
     // html start
     //
     header('Content-type: text/html; charset=utf-8');
-    print '<?xml version="1.0"?>';
+
+    $query_per_page = 20;
+    $query_total_rows = count($query_rows);
+    $query_total_pages = max(1, (int)ceil($query_total_rows / $query_per_page));
+    $query_page = max(1, min($query_page, $query_total_pages));
+    $query_start = ($query_page - 1) * $query_per_page;
+    $query_visible_rows = array_slice($query_rows, $query_start, $query_per_page);
+
+    $app_state = array(
+        'script' => $script,
+        'style' => $style,
+        'graphFormat' => $graph_format,
+        'iface' => $iface,
+        'ifaceList' => $iface_list,
+        'ifaceTitle' => $iface_title,
+        'page' => $page,
+        'pageList' => $page_list,
+        'pageTitle' => $page_title,
+        'graph' => $graph,
+        'showRx' => $show_rx,
+        'showTx' => $show_tx,
+        'showTotal' => $show_total,
+        'fromDate' => $from_date,
+        'toDate' => $to_date,
+        'customDayError' => $custom_day_error,
+        'customDayRange' => $custom_day_range,
+        'day' => $day,
+        'hour' => $hour,
+        'month' => $month,
+        'top' => $top,
+        'summary' => $summary,
+        'queryRows' => $query_visible_rows,
+        'queryTotalRows' => $query_total_rows,
+        'queryPage' => $query_page,
+        'queryTotalPages' => $query_total_pages,
+        'queryStart' => $query_start,
+        'queryGroup' => $query_group,
+        'queryFromDate' => $query_from_date,
+        'queryToDate' => $query_to_date,
+        'querySort' => $query_sort,
+        'queryDir' => $query_dir,
+    );
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>vnStat - PHP frontend</title>
-  <link rel="stylesheet" type="text/css" href="themes/<?php echo $style ?>/style.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>vnStat - React frontend</title>
+  <link rel="stylesheet" type="text/css" href="themes/<?php echo htmlspecialchars($style, ENT_QUOTES, 'UTF-8'); ?>/style.css"/>
+  <link rel="stylesheet" type="text/css" href="react-style.css"/>
 </head>
 <body>
-
-<div id="wrap">
-  <div id="sidebar"><?php write_side_bar(); ?></div>
-   <div id="content">
-    <div id="live-traffic-panel">
-      <div class="title"><?php print T('Traffic data for')." ".(isset($iface_title[$iface]) ? $iface_title[$iface] : $iface); ?></div>
-      <div id="live-rx" class="metric">In: --</div>
-      <div id="live-tx" class="metric">Out: --</div>
-      <div id="live-status">Actualizando cada 0.5s</div>
-    </div>
-    <div id="header"><?php print T('Traffic data for').(isset($iface_title[$iface]) ? $iface_title[$iface] : '')." ($iface)";?></div>
-    <div id="main">
-    <?php
-    if ($page == 'd')
-    {
-        print "<form id=\"date-range-form\" method=\"get\" action=\"$script\">\n";
-        print "<input type=\"hidden\" name=\"if\" value=\"".htmlspecialchars($iface, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        print "<input type=\"hidden\" name=\"page\" value=\"".htmlspecialchars($page, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        print "<input type=\"hidden\" name=\"graph\" value=\"".htmlspecialchars($graph, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        print "<input type=\"hidden\" name=\"style\" value=\"".htmlspecialchars($style, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        print "<input type=\"hidden\" name=\"show_rx\" value=\"".htmlspecialchars($show_rx, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        print "<input type=\"hidden\" name=\"show_tx\" value=\"".htmlspecialchars($show_tx, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        print "<input type=\"hidden\" name=\"show_total\" value=\"".htmlspecialchars($show_total, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        print "<div class=\"date-field\"><label for=\"from_date\">From Date</label><input id=\"from_date\" name=\"from_date\" type=\"date\" value=\"".htmlspecialchars($from_date, ENT_QUOTES, 'UTF-8')."\"/></div>\n";
-        print "<div class=\"date-field\"><label for=\"to_date\">To Date</label><input id=\"to_date\" name=\"to_date\" type=\"date\" value=\"".htmlspecialchars($to_date, ENT_QUOTES, 'UTF-8')."\"/></div>\n";
-        print "<button type=\"submit\">Buscar</button>\n";
-        print "</form>\n";
-
-        if ($custom_day_error !== '') {
-            print "<div class=\"date-range-message error\">$custom_day_error</div>\n";
-        } elseif (($from_date !== '' || $to_date !== '') && count($custom_day_range) === 0) {
-            print "<div class=\"date-range-message\">No hay datos para el rango seleccionado.</div>\n";
-        }
-    }
-
-    $graph_params = "if=$iface&amp;page=$page&amp;style=$style&amp;show_rx=$show_rx&amp;show_tx=$show_tx&amp;show_total=$show_total";
-    if ($page == 'd') {
-        $graph_params .= "&amp;from_date=".rawurlencode($from_date)."&amp;to_date=".rawurlencode($to_date);
-    }
-    if ($page == 'h' || $page == 'd' || $page == 'm')
-    {
-        print "<div style=\"display:flex; align-items:flex-start; gap:18px;\">\n";
-        print "<div>\n";
-        
-        if ($graph_format == 'svg') {
-	     print "<object type=\"image/svg+xml\" width=\"692\" height=\"370\" data=\"graph_svg.php?$graph_params\"></object>\n";
-        } else {
-	     print "<img src=\"graph.php?$graph_params\" alt=\"graph\"/>\n";
-        }
-        print "</div>\n";
-
-        print "<form id=\"graph-series-form\" method=\"get\" action=\"$script\">\n";
-        print "<input type=\"hidden\" name=\"if\" value=\"".htmlspecialchars($iface, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        print "<input type=\"hidden\" name=\"page\" value=\"".htmlspecialchars($page, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        print "<input type=\"hidden\" name=\"graph\" value=\"".htmlspecialchars($graph, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        print "<input type=\"hidden\" name=\"style\" value=\"".htmlspecialchars($style, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        if ($page == 'd') {
-            print "<input type=\"hidden\" name=\"from_date\" value=\"".htmlspecialchars($from_date, ENT_QUOTES, 'UTF-8')."\"/>\n";
-            print "<input type=\"hidden\" name=\"to_date\" value=\"".htmlspecialchars($to_date, ENT_QUOTES, 'UTF-8')."\"/>\n";
-        }
-
-        print "<div class=\"date-field\"><input type=\"hidden\" name=\"show_rx\" value=\"0\"/><label><input type=\"checkbox\" name=\"show_rx\" value=\"1\"".($show_rx === '1' ? ' checked="checked"' : '')."/> Entrada</label></div>\n";
-        print "<div class=\"date-field\"><input type=\"hidden\" name=\"show_tx\" value=\"0\"/><label><input type=\"checkbox\" name=\"show_tx\" value=\"1\"".($show_tx === '1' ? ' checked="checked"' : '')."/> Salida</label></div>\n";
-        print "<div class=\"date-field\"><input type=\"hidden\" name=\"show_total\" value=\"0\"/><label><input type=\"checkbox\" name=\"show_total\" value=\"1\"".($show_total === '1' ? ' checked="checked"' : '')."/> Total</label></div>\n";
-        print "<button type=\"submit\">Aplicar gráfico</button>\n";
-        print "</form>\n";
-        print "</div>\n";
-    }
-
-    if ($page == 's')
-    {
-        write_summary();
-    }
-    else if ($page == 'h')
-    {
-        write_data_table(T('Last 24 hours'), $hour);
-    }
-    else if ($page == 'd')
-    {
-        if (count($custom_day_range) > 0) {
-            write_data_table('Días en el rango seleccionado', $custom_day_range);
-        }
-        else if ($from_date === '' && $to_date === '') {
-            write_data_table(T('Last 30 days'), $day);
-        }
-    }
-    else if ($page == 'm')
-    {
-        write_data_table(T('Last 12 months'), $month);
-    }
-    else if ($page == 'q')
-    {
-        write_query_results($query_rows, $query_page, $query_group, $query_from_date, $query_to_date, $query_sort, $query_dir);
-    }
-    ?>
-    </div>
-    <div id="footer"><a href="http://www.sqweek.com/">vnStat PHP frontend</a> 2.0.0 - &copy;2006-2011 Bjorge Dijkstra (bjd _at_ jooz.net)</div>
-  </div>
-</div>
-
-<script type="text/javascript">
-(function () {
-  var lastSample = null;
-
-  function formatRate(bytesPerSecond) {
-    var units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
-    var value = bytesPerSecond;
-    var index = 0;
-
-    while (value >= 1000 && index < units.length - 1) {
-      value = value / 1000;
-      index += 1;
-    }
-
-    return value.toFixed(2) + ' ' + units[index];
-  }
-
-  function updatePanel() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'live.php?if=<?php print rawurlencode($iface); ?>&style=<?php print rawurlencode($style); ?>', true);
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState !== 4) {
-        return;
-      }
-
-      if (xhr.status !== 200) {
-        document.getElementById('live-status').textContent = 'Error al obtener datos en tiempo real';
-        return;
-      }
-
-      var data;
-      try {
-        data = JSON.parse(xhr.responseText);
-      } catch (e) {
-        document.getElementById('live-status').textContent = 'Error al procesar datos';
-        return;
-      }
-
-      if (!lastSample) {
-        lastSample = data;
-        return;
-      }
-
-      var elapsed = (data.timestamp_ms - lastSample.timestamp_ms) / 1000;
-      if (elapsed <= 0) {
-        lastSample = data;
-        return;
-      }
-
-      var rxRate = (data.rx_bytes - lastSample.rx_bytes) / elapsed;
-      var txRate = (data.tx_bytes - lastSample.tx_bytes) / elapsed;
-
-      if (rxRate < 0) { rxRate = 0; }
-      if (txRate < 0) { txRate = 0; }
-
-      document.getElementById('live-rx').textContent = 'In: ' + formatRate(rxRate);
-      document.getElementById('live-tx').textContent = 'Out: ' + formatRate(txRate);
-      document.getElementById('live-status').textContent = 'Actualizado: ' + (new Date()).toLocaleTimeString();
-
-      lastSample = data;
-    };
-
-    xhr.send();
-  }
-
-  updatePanel();
-  setInterval(updatePanel, 1200);
-})();
-</script>
-
-</body></html>
+  <div id="app"></div>
+  <script>
+    window.VNSTAT_APP_STATE = <?php echo json_encode($app_state, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+  </script>
+  <script src="vendor/react.production.min.js"></script>
+  <script src="vendor/react-dom.production.min.js"></script>
+  <script src="react-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+.react-layout {
+  display: flex;
+  gap: 16px;
+}
+
+#content {
+  width: 100%;
+}
+
+#live-traffic-panel {
+  margin-bottom: 12px;
+}
+
+#main form {
+  margin-bottom: 12px;
+}
